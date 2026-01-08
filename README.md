@@ -52,6 +52,11 @@ Nmano0006 (nmano0006@gmail.com)
 
 MIT License
 
+## Community Discussion
+
+Join the discussion on InsanelyMac:
+[InsanelyMac Thread](https://www.insanelymac.com/forum/topic/362188-sysm-macos-system-maintenance-tool/)
+
 ## ☕ Support Development
 
 SYSM is free and open-source. If you find it useful, please consider supporting its development:
