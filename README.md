@@ -8,6 +8,20 @@ A comprehensive macOS application for system maintenance, drive management, kext
 
 **[Download Latest Version](https://github.com/nmano0006/SYSM/releases/latest/download/SYSM.dmg)**
 
+## 📸 Screenshots
+
+| Drive Management | System Information | Kexts Manager |
+|:---:|:---:|:---:|
+| ![Drive Management](https://raw.githubusercontent.com/nmano0006/SYSM/main/screenshots/1-Drives.png) | ![System Information](https://raw.githubusercontent.com/nmano0006/SYSM/main/screenshots/2-System.png) | ![Kexts Manager](https://raw.githubusercontent.com/nmano0006/SYSM/main/screenshots/3-Kexts.png) |
+
+| Audio Tools | Calculator | SSDT Generator |
+|:---:|:---:|:---:|
+| ![Audio Tools](https://raw.githubusercontent.com/nmano0006/SYSM/main/screenshots/4-Audio.png) | ![Calculator](https://raw.githubusercontent.com/nmano0006/SYSM/main/screenshots/5-Calculator.png) | ![SSDT Generator](https://raw.githubusercontent.com/nmano0006/SYSM/main/screenshots/6-SSDT%20Generator.png) |
+
+| Info/About | Troubleshooter |
+|:---:|:---:|
+| ![Info/About](https://raw.githubusercontent.com/nmano0006/SYSM/main/screenshots/7-Info.png) | ![Troubleshooter](https://raw.githubusercontent.com/nmano0006/SYSM/main/screenshots/8-Troubleshoot.png) |
+
 ## 🚀 Features
 
 - **Drive Management**: Mount/unmount drives, view disk information
