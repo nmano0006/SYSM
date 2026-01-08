@@ -51,3 +51,23 @@ Nmano0006 (nmano0006@gmail.com)
 ## 📄 License
 
 MIT License
+
+## ☕ Support Development
+
+SYSM is free and open-source. If you find it useful, please consider supporting its development:
+
+**[Donate via PayPal](https://www.paypal.com/donate/?business=H3PV9HX92AVMJ&no_recurring=0&item_name=Support+SYSM+development.+Donations+fund+testing+devices+%26+server+costs+for+this+open-source+tool.&currency_code=CAD)**
+
+### Why Support?
+- Funds continued development and updates
+- Helps add new features and tools  
+- Covers testing devices and server costs
+- Supports free, open-source software development
+
+### Support Tiers:
+- ☕ **$5** - Coffee supporter
+- 💻 **$15** - Developer supporter
+- 🚀 **$30** - Premium supporter
+- 🏆 **$50+** - Gold supporter
+
+*Every donation helps keep SYSM updated and improves the tool for everyone!*
