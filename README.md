@@ -22,15 +22,40 @@ A comprehensive macOS application for system maintenance, drive management, kext
 |:---:|:---:|
 | ![Info/About](https://raw.githubusercontent.com/nmano0006/SYSM/main/screenshots/7-Info.png) | ![Troubleshooter](https://raw.githubusercontent.com/nmano0006/SYSM/main/screenshots/8-Troubleshoot.png) |
 
-## 🚀 Features
+## 🛠️ Building from Source
 
-- **Drive Management**: Mount/unmount drives, view disk information
-- **System Information**: Detailed system specs and status
-- **Kexts Manager**: Manage kernel extensions
-- **Audio Tools**: Audio configuration and troubleshooting
-- **Hex/Base64 Calculator**: Encoding/decoding utilities
-- **SSDT Generator**: ACPI table generation
-- **Troubleshooter**: System diagnostics and issue resolution
+### Requirements:
+- Xcode 14.0 or later
+- macOS 11.0 (Big Sur) or later
+- Swift 5.7+
+
+### Steps:
+\`\`\`bash
+# Clone repository
+git clone https://github.com/nmano0006/SYSM.git
+cd SYSM
+
+# Open in Xcode
+open SystemMaintenance.xcodeproj
+\`\`\`
+
+1. In Xcode: Press **⌘+B** to Build
+2. Press **⌘+R** to Run
+3. Or use **Product → Archive** for distribution
+
+### Project Structure:
+- \`SystemMaintenance/src/ContentView.swift\` - Main application interface
+- \`SystemMaintenance/src/ShellHelper.swift\` - System command utilities
+- \`SystemMaintenance/src/Views/\` - 15+ feature views
+- \`SystemMaintenance/src/Models/\` - Data models
+- \`SystemMaintenance/src/Helpers/\` - Helper classes
+- \`SystemMaintenance/docs/assets/\` - App icons and images
+
+### Contributing:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a Pull Request
 
 ## ⚙️ Installation
 
@@ -51,28 +76,3 @@ Nmano0006 (nmano0006@gmail.com)
 ## 📄 License
 
 MIT License
-
-## Community Discussion
-
-Join the discussion on InsanelyMac:
-[InsanelyMac Thread](https://www.insanelymac.com/forum/topic/362188-sysm-macos-system-maintenance-tool/)
-
-## ☕ Support Development
-
-SYSM is free and open-source. If you find it useful, please consider supporting its development:
-
-**[Donate via PayPal](https://www.paypal.com/donate/?business=H3PV9HX92AVMJ&no_recurring=0&item_name=Support+SYSM+development.+Donations+fund+testing+devices+%26+server+costs+for+this+open-source+tool.&currency_code=CAD)**
-
-### Why Support?
-- Funds continued development and updates
-- Helps add new features and tools  
-- Covers testing devices and server costs
-- Supports free, open-source software development
-
-### Support Tiers:
-- ☕ **$5** - Coffee supporter
-- 💻 **$15** - Developer supporter
-- 🚀 **$30** - Premium supporter
-- 🏆 **$50+** - Gold supporter
-
-*Every donation helps keep SYSM updated and improves the tool for everyone!*
