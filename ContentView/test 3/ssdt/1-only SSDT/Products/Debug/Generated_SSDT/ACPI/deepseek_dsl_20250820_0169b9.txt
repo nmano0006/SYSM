@@ -1,0 +1,303 @@
+DefinitionBlock ("", "SSDT", 2, "HACK", "PCI", 0x00000000)
+{
+    External (_SB_.PC00.PEG0, DeviceObj)
+    External (_SB_.PC00.PEG0.PEGP, DeviceObj)
+    External (_SB_.PC00.PEG1, DeviceObj)
+    External (_SB_.PC00.PEG1.PEGP, DeviceObj)
+    External (_SB_.PC00.PEG1.PEGP.EGP0, DeviceObj)
+    External (DTGP, MethodObj)
+
+    Scope (\_SB.PC00.PEG1.PEGP)
+    {
+        Device (EGPA)
+        {
+            Name (_ADR, Zero)
+            Name (_STA, 0x0F)
+            
+            Device (GFX0)
+            {
+                Name (_ADR, Zero)
+                Name (_STA, 0x0F)
+                
+                Method (_DSM, 4, NotSerialized)
+                {
+                    If (!Arg2)
+                    {
+                        Return (Buffer (One)
+                        {
+                             0x03
+                        })
+                    }
+                    
+                    Return (Package (0x24)
+                    {
+                        "built-in", 
+                        Buffer (One)
+                        {
+                             0x00
+                        }, 
+                        
+                        "name", 
+                        Buffer (0x0D)
+                        {
+                            "AMD Radeon"
+                        }, 
+                        
+                        "model", 
+                        Buffer (0x17)
+                        {
+                            "AMD Radeon RX Vega 64"
+                        }, 
+                        
+                        "device_type", 
+                        Buffer (0x08)
+                        {
+                            "Display"
+                        }, 
+                        
+                        "AAPL,slot-name", 
+                        Buffer (0x08)
+                        {
+                            "Slot-1"
+                        }, 
+                        
+                        "hda-gfx", 
+                        Buffer (0x0A)
+                        {
+                            "onboard-1"
+                        }, 
+                        
+                        "@0,connector-type", 
+                        Buffer (0x05)
+                        {
+                            "0004"
+                        }, 
+                        
+                        "@1,connector-type", 
+                        Buffer (0x05)
+                        {
+                            "0004"
+                        }, 
+                        
+                        "@2,connector-type", 
+                        Buffer (0x05)
+                        {
+                            "0004"
+                        }, 
+                        
+                        "@3,connector-type", 
+                        Buffer (0x05)
+                        {
+                            "0004"
+                        }, 
+                        
+                        "@4,connector-type", 
+                        Buffer (0x05)
+                        {
+                            "0004"
+                        }, 
+                        
+                        "@5,connector-type", 
+                        Buffer (0x05)
+                        {
+                            "0004"
+                        }, 
+                        
+                        "ATY,Card#", 
+                        Buffer (0x0F)
+                        {
+                            "109-C980A1-00"
+                        }, 
+                        
+                        "ATY,EFIVersion", 
+                        Buffer (0x14)
+                        {
+                            "113-VE64SKU-017"
+                        }, 
+                        
+                        "ATY,FamilyName", 
+                        Buffer (0x0A)
+                        {
+                            "Radeon"
+                        }, 
+                        
+                        "ATY,DeviceName", 
+                        Buffer (0x0A)
+                        {
+                            "Vega 10"
+                        }, 
+                        
+                        "vendor-id", 
+                        Buffer (0x04)
+                        {
+                             0x02, 0x10, 0x00, 0x00
+                        }, 
+                        
+                        "device-id", 
+                        Buffer (0x04)
+                        {
+                             0x40, 0x67, 0x00, 0x00
+                        }, 
+                        
+                        "subsystem-vendor-id", 
+                        Buffer (0x04)
+                        {
+                             0x02, 0x10, 0x00, 0x00
+                        }, 
+                        
+                        "subsystem-id", 
+                        Buffer (0x04)
+                        {
+                             0x0B, 0x14, 0x00, 0x00
+                        }
+                    })
+                }
+                
+                Name (_PRW, Package (0x02)
+                {
+                    0x6D, 
+                    Zero
+                })
+            }
+            
+            Device (HDAU)
+            {
+                Name (_ADR, One)
+                Name (_STA, 0x0F)
+                
+                OperationRegion (HDAH, PCI_Config, Zero, 0x40)
+                Field (HDAH, ByteAcc, NoLock, Preserve)
+                {
+                    VID0,   16, 
+                    DID0,   16
+                }
+                
+                Method (_DSM, 4, NotSerialized)
+                {
+                    If (!Arg2)
+                    {
+                        Return (Buffer (One)
+                        {
+                             0x03
+                        })
+                    }
+                    
+                    Return (Package (0x16)
+                    {
+                        "built-in", 
+                        Buffer (One)
+                        {
+                             0x00
+                        }, 
+                        
+                        "AAPL,slot-name", 
+                        Buffer (0x07)
+                        {
+                            "Slot-1"
+                        }, 
+                        
+                        "layout-id", 
+                        Buffer (0x04)
+                        {
+                             0x07, 0x00, 0x00, 0x00
+                        }, 
+                        
+                        "name", 
+                        Buffer (0x1F)
+                        {
+                            "Radeon RX Vega 64 8GB HD-Audio"
+                        }, 
+                        
+                        "model", 
+                        Buffer (0x1F)
+                        {
+                            "Radeon RX Vega 64 8GB HD-Audio"
+                        }, 
+                        
+                        "device_type", 
+                        Buffer (0x16)
+                        {
+                            "Multimedia Controller"
+                        }, 
+                        
+                        "device-id", 
+                        Buffer (0x04)
+                        {
+                             0xF8, 0xAA, 0x00, 0x00
+                        }, 
+                        
+                        "subsystem-id", 
+                        Buffer (0x04)
+                        {
+                             0xF8, 0xAA, 0x00, 0x00
+                        }, 
+                        
+                        "subsystem-vendor-id", 
+                        Buffer (0x04)
+                        {
+                             0x02, 0x10, 0x00, 0x00
+                        }, 
+                        
+                        "compatible", 
+                        Buffer (0x0D)
+                        {
+                            "pci1002,aaf8"
+                        }, 
+                        
+                        "hda-gfx", 
+                        Buffer (0x0A)
+                        {
+                            "onboard-1"
+                        }, 
+                        
+                        "pinconfigurations", 
+                        Buffer (Zero) {},
+                        
+                        "MaximumBootBeepVolume", 
+                        Buffer (One)
+                        {
+                             0x4E
+                        }
+                    })
+                }
+            }
+        }
+    }
+    
+    Method (\_SB.PC00.PEG1.PEGP.EGP0._STA, 0, NotSerialized)
+    {
+        Return (Zero)
+    }
+    
+    // DTGP Method for Device Specific Method handling
+    Method (DTGP, 5, NotSerialized)
+    {
+        If (LEqual (Arg0, Buffer (0x10)
+            {
+                /* 0000 */    0xC6, 0xB7, 0x6D, 0x4B, 0x4D, 0x15, 0xDB, 0x46, 
+                /* 0008 */    0x8B, 0x5B, 0x08, 0x5D, 0x5C, 0xE9, 0x2C, 0x53
+            }))
+        {
+            If (LEqual (Arg1, One))
+            {
+                // Check if UUID matches
+                If (LEqual (Arg2, Zero))
+                {
+                    // Return supported functions
+                    Store (Buffer (One) { 0x7F }, Arg4)
+                    Return (One)
+                }
+                
+                If (LEqual (Arg2, One))
+                {
+                    // Return current status
+                    Return (One)
+                }
+            }
+        }
+        
+        // UUID not matched or function not supported
+        Store (Buffer (One) { 0x00 }, Arg4)
+        Return (Zero)
+    }
+}

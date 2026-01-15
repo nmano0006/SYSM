@@ -1,0 +1,147 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2867
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fnil\fcharset0 Menlo-Regular;\f2\fnil\fcharset0 Menlo-Bold;
+}
+{\colortbl;\red255\green255\blue255;\red13\green14\blue17;\red230\green234\blue239;}
+{\*\expandedcolortbl;;\cssrgb\c5882\c6667\c8235;\cssrgb\c92157\c93333\c94902;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid101\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid201\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid3}
+{\list\listtemplateid4\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid301\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid4}
+{\list\listtemplateid5\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid401\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid5}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}{\listoverride\listid4\listoverridecount0\ls4}{\listoverride\listid5\listoverridecount0\ls5}}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sa320\partightenfactor0
+
+\f0\fs44 \cf2 \expnd0\expndtw0\kerning0
+Key Changes Made:\
+
+\fs40 1. Enhanced SSDTGeneratorView:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls1\ilvl0
+\fs32 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Added USB-specific state variables: 
+\f1\fs28 \cb3 usbControllerType
+\f0\fs32 \cb1 , 
+\f1\fs28 \cb3 usbVersion
+\f0\fs32 \cb1 , 
+\f1\fs28 \cb3 includeTypeC
+\f0\fs32 \cb1 , 
+\f1\fs28 \cb3 includeThunderbolt
+\f0\fs32 \cb1 \
+\ls1\ilvl0\kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Updated 
+\f1\fs28 \cb3 usbPortCounts
+\f0\fs32 \cb1  array with all port options\
+\ls1\ilvl0\kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Enhanced USB UI section with controller type, USB version, and Type-C/Thunderbolt toggles\
+\pard\pardeftab720\sa320\partightenfactor0
+
+\fs40 \cf2 2. Added USB SSDT Generation Functions:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls2\ilvl0
+\f1\fs28 \cf2 \cb3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+generateUSBX()
+\f0\fs32 \cb1  - USB Power Properties\
+\ls2\ilvl0
+\f1\fs28 \cb3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+generateUIAC()
+\f0\fs32 \cb1  - USB Port Mapping\
+\ls2\ilvl0
+\f1\fs28 \cb3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+generateXHCI()
+\f0\fs32 \cb1  - Main XHCI controller with dynamic port generation\
+\ls2\ilvl0
+\f1\fs28 \cb3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+generateEHCx()
+\f0\fs32 \cb1  - EHCI (USB 2.0) controller\
+\ls2\ilvl0
+\f1\fs28 \cb3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+generateRHUB()
+\f0\fs32 \cb1  - USB Root Hub\
+\ls2\ilvl0
+\f1\fs28 \cb3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+generateXHC()
+\f0\fs32 \cb1  - XHCI extended controller\
+\ls2\ilvl0
+\f1\fs28 \cb3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+generatePRT()
+\f0\fs32 \cb1  - USB Port Renaming\
+\ls2\ilvl0
+\f1\fs28 \cb3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+generateUSBPWR()
+\f0\fs32 \cb1  - USB Power Management\
+\ls2\ilvl0
+\f1\fs28 \cb3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+generateTYPEC()
+\f0\fs32 \cb1  - USB Type-C configuration\
+\ls2\ilvl0
+\f1\fs28 \cb3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+generateTB3()
+\f0\fs32 \cb1  - Thunderbolt 3 support\
+\ls2\ilvl0
+\f1\fs28 \cb3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+generateUSBMAP()
+\f0\fs32 \cb1  - Complete USB port mapping\
+\ls2\ilvl0
+\f1\fs28 \cb3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+generateUSBWAKE()
+\f0\fs32 \cb1  - USB wake fix\
+\ls2\ilvl0
+\f1\fs28 \cb3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+generateUSBAC()
+\f0\fs32 \cb1  - USB AC adapter detection\
+\pard\pardeftab720\sa320\partightenfactor0
+
+\fs40 \cf2 3. Updated 
+\f2\b\fs35 \cb3 generateValidDSLContent
+\f0\b0\fs40 \cb1  Function:\
+\pard\pardeftab720\sa320\partightenfactor0
+
+\fs32 \cf2 Added cases for all USB SSDTs to route to the appropriate generation functions.\
+\pard\pardeftab720\sa320\partightenfactor0
+
+\fs40 \cf2 4. USB Helper Functions:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls3\ilvl0
+\f1\fs28 \cf2 \cb3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+calculateCurrentAvailable()
+\f0\fs32 \cb1  - Dynamic current calculation based on port count\
+\ls3\ilvl0
+\f1\fs28 \cb3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+calculateCurrentExtra()
+\f0\fs32 \cb1  - Extra current for sleep\
+\ls3\ilvl0
+\f1\fs28 \cb3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+calculateRootHubDepth()
+\f0\fs32 \cb1  - Proper root hub depth calculation\
+\pard\pardeftab720\sa320\partightenfactor0
+
+\fs40 \cf2 5. UI Enhancements:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls4\ilvl0
+\fs32 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+USB-specific essential SSDTs shown when USB device type is selected\
+\ls4\ilvl0\kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Enhanced USB configuration UI with all necessary options\
+\ls4\ilvl0\kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Dynamic port generation based on selected port count\
+\pard\pardeftab720\sa320\partightenfactor0
+\cf2 The SSDT generation now supports:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls5\ilvl0\cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+5 to 30 USB ports (configurable)\
+\ls5\ilvl0\kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+USB 2.0 (HS) and USB 3.0+ (SS) ports\
+\ls5\ilvl0\kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Type-C support\
+\ls5\ilvl0\kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Thunderbolt 3 support\
+\ls5\ilvl0\kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Proper power management\
+\ls5\ilvl0\kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Dynamic current allocation\
+\ls5\ilvl0\kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Wake functionality fixes\
+\ls5\ilvl0\kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Complete port mapping}

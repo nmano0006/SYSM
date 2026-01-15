@@ -1,0 +1,144 @@
+{
+  "source": "/Users/z790/Desktop/SystemMaintenanceMac/SystemMaintenance/SystemMaintenance/Views/KextsManagerView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Kext Operation",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 83
+        }
+      },
+      {
+        "comment": "",
+        "key": "Loading kernel extensions...",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 67
+        }
+      },
+      {
+        "comment": "",
+        "key": "Kernel Extensions",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 28
+        }
+      },
+      {
+        "comment": "",
+        "key": "Refresh",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 35
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search kexts...",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 48
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 84
+        }
+      },
+      {
+        "comment": "",
+        "key": "No Kernel Extensions Found",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 96
+        }
+      },
+      {
+        "comment": "",
+        "key": "Connect to the system kernel or check permissions",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 100
+        }
+      },
+      {
+        "comment": "",
+        "key": "Refresh",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 104
+        }
+      },
+      {
+        "comment": "",
+        "key": "Load Kext",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 121
+        }
+      },
+      {
+        "comment": "",
+        "key": "Unload Kext",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 126
+        }
+      },
+      {
+        "comment": "",
+        "key": "Show Info",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 133
+        }
+      },
+      {
+        "comment": "",
+        "key": "Load All",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 145
+        }
+      },
+      {
+        "comment": "",
+        "key": "Unload All",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 151
+        }
+      },
+      {
+        "comment": "",
+        "key": "System Report",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 157
+        }
+      },
+      {
+        "comment": "",
+        "key": "Loaded",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 190
+        }
+      },
+      {
+        "comment": "",
+        "key": "Not Loaded",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 190
+        }
+      }
+    ]
+  },
+  "version": 1
+}

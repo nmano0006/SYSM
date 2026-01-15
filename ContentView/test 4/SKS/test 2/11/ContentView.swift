@@ -1,0 +1,1808 @@
+import SwiftUI
+import UniformTypeIdentifiers
+import Foundation
+import AppKit
+import Combine
+
+// MARK: - Shell Helper
+class ShellHelper {
+    static let shared = ShellHelper()
+    
+    private init() {}
+    
+    func runCommand(_ command: String, needsSudo: Bool = false) -> (output: String, error: String, success: Bool) {
+        print("🔧 Running command: \(command)")
+        let task = Process()
+        let outputPipe = Pipe()
+        let errorPipe = Pipe()
+        
+        task.standardOutput = outputPipe
+        task.standardError = errorPipe
+        
+        if needsSudo {
+            let escapedCommand = command.replacingOccurrences(of: "\"", with: "\\\"")
+            let appleScript = """
+            do shell script "\(escapedCommand)" 
+            with administrator privileges 
+            with prompt "SystemMaintenance needs administrator access" 
+            without altering line endings
+            """
+            
+            task.arguments = ["-c", "osascript -e '\(appleScript)'"]
+            task.launchPath = "/bin/zsh"
+        } else {
+            task.arguments = ["-c", command]
+            task.launchPath = "/bin/zsh"
+        }
+        
+        do {
+            try task.run()
+        } catch {
+            print("❌ Process execution error: \(error)")
+            return ("", "Process execution error: \(error)", false)
+        }
+        
+        let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
+        let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+        
+        let output = String(data: outputData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let errorOutput = String(data: errorData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        
+        task.waitUntilExit()
+        let success = task.terminationStatus == 0
+        
+        print("📝 Command output length: \(output.count) characters")
+        if !errorOutput.isEmpty {
+            print("⚠️ Command error: \(errorOutput)")
+        }
+        print("✅ Command success: \(success)")
+        
+        return (output, errorOutput, success)
+    }
+    
+    // Get ALL drives (mounted and unmounted) - Improved detection
+    func getAllDrives() -> [DriveInfo] {
+        print("🔍 Getting all drives...")
+        
+        var drives: [DriveInfo] = []
+        
+        // Get all user-mounted volumes from /Volumes (excluding system volumes)
+        let mountedVolumes = getMountedVolumes()
+        print("📌 Found \(mountedVolumes.count) mounted volumes")
+        drives.append(contentsOf: mountedVolumes)
+        
+        // Get potentially unmounted partitions (excluding system partitions)
+        let unmountedPartitions = getUnmountedPartitions()
+        print("📌 Found \(unmountedPartitions.count) unmounted partitions")
+        drives.append(contentsOf: unmountedPartitions)
+        
+        // Get external unmounted drives specifically
+        let externalUnmounted = getExternalUnmountedDrives()
+        print("📌 Found \(externalUnmounted.count) external unmounted drives")
+        drives.append(contentsOf: externalUnmounted)
+        
+        // Remove duplicates and sort
+        var uniqueDrives: [DriveInfo] = []
+        var seenIdentifiers = Set<String>()
+        
+        for drive in drives {
+            if !seenIdentifiers.contains(drive.identifier) {
+                seenIdentifiers.insert(drive.identifier)
+                uniqueDrives.append(drive)
+            }
+        }
+        
+        // Sort: mounted first, then unmounted, then alphabetically
+        uniqueDrives.sort {
+            if $0.isMounted != $1.isMounted {
+                return $0.isMounted && !$1.isMounted
+            }
+            if $0.isInternal != $1.isInternal {
+                return !$0.isInternal && $1.isInternal  // External first
+            }
+            return $0.name.lowercased() < $1.name.lowercased()
+        }
+        
+        print("✅ Total unique drives found: \(uniqueDrives.count)")
+        for drive in uniqueDrives {
+            print("   - \(drive.name) (\(drive.identifier)): \(drive.isMounted ? "Mounted" : "Unmounted") - \(drive.type)")
+        }
+        
+        return uniqueDrives
+    }
+    
+    private func getMountedVolumes() -> [DriveInfo] {
+        print("📌 Getting mounted volumes...")
+        var volumes: [DriveInfo] = []
+        
+        // Get df output for all mounted volumes
+        let dfResult = runCommand("df -h")
+        let dfLines = dfResult.output.components(separatedBy: "\n")
+        
+        // Parse df output
+        for line in dfLines {
+            let components = line.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
+            
+            // Skip header and empty lines
+            if components.count < 6 || components[0] == "Filesystem" {
+                continue
+            }
+            
+            let devicePath = components[0]
+            let mountPoint = components[5]
+            
+            // Only process /dev/disk devices that are user volumes
+            if devicePath.hasPrefix("/dev/disk") {
+                let deviceId = devicePath.replacingOccurrences(of: "/dev/", with: "")
+                
+                // Skip system partitions if not in /Volumes/
+                if !mountPoint.hasPrefix("/Volumes/") && 
+                   (mountPoint.contains("/System/Volumes/") ||
+                    mountPoint == "/" ||
+                    mountPoint.contains("home") ||
+                    mountPoint.contains("private/var") ||
+                    mountPoint.contains("Library/Developer")) {
+                    print("⚠️ Skipping system volume: \(deviceId) at \(mountPoint)")
+                    continue
+                }
+                
+                let volumeName = (mountPoint as NSString).lastPathComponent
+                let size = components.count >= 2 ? components[1] : "Unknown"
+                
+                // Get detailed info
+                let drive = getDriveInfo(deviceId: deviceId)
+                
+                let updatedDrive = DriveInfo(
+                    name: drive.name == deviceId ? volumeName : drive.name,
+                    identifier: deviceId,
+                    size: size != "Unknown" ? size : drive.size,
+                    type: drive.type,
+                    mountPoint: mountPoint,
+                    isInternal: drive.isInternal,
+                    isEFI: deviceId.contains("EFI") || volumeName == "EFI" || drive.name.contains("EFI"),
+                    partitions: drive.partitions,
+                    isMounted: true,
+                    isSelectedForMount: false,
+                    isSelectedForUnmount: false
+                )
+                
+                volumes.append(updatedDrive)
+                print("📌 Found mounted volume: \(updatedDrive.name) (\(deviceId)) at \(mountPoint)")
+            }
+        }
+        
+        return volumes
+    }
+    
+    private func getUnmountedPartitions() -> [DriveInfo] {
+        print("📌 Getting unmounted partitions...")
+        var partitions: [DriveInfo] = []
+        
+        // Get list of ALL disk partitions
+        let listResult = runCommand("diskutil list")
+        let lines = listResult.output.components(separatedBy: "\n")
+        
+        var currentDisk = ""
+        var partitionPattern = ""
+        
+        for line in lines {
+            // Check for disk identifier line
+            if line.contains("/dev/disk") && line.contains("GUID_partition_scheme") {
+                let components = line.components(separatedBy: " ")
+                if let diskId = components.first(where: { $0.contains("disk") })?.replacingOccurrences(of: "/dev/", with: "") {
+                    currentDisk = diskId
+                    print("📋 Processing disk: \(currentDisk)")
+                }
+            }
+            
+            // Look for partition lines
+            if line.contains("disk") && line.contains("s") && line.contains("Apple_") {
+                let components = line.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
+                
+                if let partitionId = components.first(where: { $0.hasPrefix("disk") && $0.contains("s") }) {
+                    // Skip if it starts with the current disk (like disk0s1 on disk0)
+                    if !currentDisk.isEmpty && partitionId.hasPrefix(currentDisk) {
+                        // Get partition info
+                        let drive = getDriveInfo(deviceId: partitionId)
+                        
+                        // Check if it's mounted
+                        let mountCheck = runCommand("diskutil info /dev/\(partitionId) | grep 'Mount Point'")
+                        let isMounted = !mountCheck.output.contains("Not applicable") && !mountCheck.output.contains("No mount point")
+                        
+                        if !isMounted {
+                            // Skip empty or system partitions
+                            if !drive.name.contains("Recovery") && 
+                               !drive.name.contains("VM") && 
+                               !drive.name.contains("Preboot") && 
+                               !drive.name.contains("Update") &&
+                               !drive.name.contains("Apple_APFS_ISC") &&
+                               drive.size != "0 B" {
+                                
+                                let unmountedDrive = DriveInfo(
+                                    name: drive.name,
+                                    identifier: partitionId,
+                                    size: drive.size,
+                                    type: drive.type,
+                                    mountPoint: "",
+                                    isInternal: drive.isInternal,
+                                    isEFI: partitionId.contains("EFI") || drive.name.contains("EFI"),
+                                    partitions: drive.partitions,
+                                    isMounted: false,
+                                    isSelectedForMount: false,
+                                    isSelectedForUnmount: false
+                                )
+                                
+                                partitions.append(unmountedDrive)
+                                print("📌 Found unmounted partition: \(drive.name) (\(partitionId)) - Size: \(drive.size)")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        return partitions
+    }
+    
+    private func getExternalUnmountedDrives() -> [DriveInfo] {
+        print("📌 Getting external unmounted drives...")
+        var drives: [DriveInfo] = []
+        
+        // List all external disks
+        let listResult = runCommand("""
+        diskutil list external | grep -E 'disk[0-9]+s[0-9]+' | awk '{print $1}' | sort -u
+        """)
+        
+        let partitionIds = listResult.output.components(separatedBy: "\n").filter { !$0.isEmpty }
+        
+        for partitionId in partitionIds {
+            let drive = getDriveInfo(deviceId: partitionId)
+            
+            if !drive.isMounted && !drive.isInternal {
+                let unmountedDrive = DriveInfo(
+                    name: drive.name,
+                    identifier: partitionId,
+                    size: drive.size,
+                    type: drive.type,
+                    mountPoint: "",
+                    isInternal: false,
+                    isEFI: false,
+                    partitions: drive.partitions,
+                    isMounted: false,
+                    isSelectedForMount: false,
+                    isSelectedForUnmount: false
+                )
+                
+                drives.append(unmountedDrive)
+                print("📌 Found external unmounted: \(drive.name) (\(partitionId))")
+            }
+        }
+        
+        return drives
+    }
+    
+    private func getDriveInfo(deviceId: String) -> DriveInfo {
+        print("📋 Getting info for device: \(deviceId)")
+        
+        // Get detailed info from diskutil
+        let infoResult = runCommand("diskutil info /dev/\(deviceId) 2>/dev/null || echo 'Not found'")
+        
+        var name = deviceId
+        var size = "Unknown"
+        var type = "Unknown"
+        var mountPoint = ""
+        var isInternal = false
+        var isUSB = false
+        var isMounted = false
+        
+        let lines = infoResult.output.components(separatedBy: "\n")
+        for line in lines {
+            let trimmedLine = line.trimmingCharacters(in: .whitespaces)
+            
+            if trimmedLine.contains("Volume Name:") {
+                let components = trimmedLine.components(separatedBy: ":")
+                if components.count > 1 {
+                    let volumeName = components[1].trimmingCharacters(in: .whitespaces)
+                    if !volumeName.isEmpty && volumeName != "Not applicable" && volumeName != "Not applicable (none)" {
+                        name = volumeName
+                    }
+                }
+            } else if trimmedLine.contains("Volume Size:") || trimmedLine.contains("Disk Size:") {
+                let components = trimmedLine.components(separatedBy: ":")
+                if components.count > 1 {
+                    size = components[1].trimmingCharacters(in: .whitespaces)
+                }
+            } else if trimmedLine.contains("Mount Point:") {
+                let components = trimmedLine.components(separatedBy: ":")
+                if components.count > 1 {
+                    mountPoint = components[1].trimmingCharacters(in: .whitespaces)
+                    isMounted = !mountPoint.isEmpty && mountPoint != "Not applicable" && mountPoint != "Not applicable (none)"
+                }
+            } else if trimmedLine.contains("Protocol:") {
+                let components = trimmedLine.components(separatedBy: ":")
+                if components.count > 1 {
+                    let protocolType = components[1].trimmingCharacters(in: .whitespaces)
+                    if protocolType.contains("USB") {
+                        isUSB = true
+                        type = "USB"
+                    } else if protocolType.contains("SATA") || protocolType.contains("PCI") {
+                        isInternal = true
+                        type = "Internal"
+                    } else {
+                        type = protocolType
+                    }
+                }
+            } else if trimmedLine.contains("Bus Protocol:") {
+                let components = trimmedLine.components(separatedBy: ":")
+                if components.count > 1 {
+                    let busType = components[1].trimmingCharacters(in: .whitespaces)
+                    if busType.contains("USB") {
+                        isUSB = true
+                        type = "USB"
+                    }
+                }
+            } else if trimmedLine.contains("Device / Media Name:") {
+                let components = trimmedLine.components(separatedBy: ":")
+                if components.count > 1 {
+                    let mediaName = components[1].trimmingCharacters(in: .whitespaces)
+                    if (name == deviceId || name.isEmpty) && !mediaName.isEmpty {
+                        name = mediaName
+                    }
+                }
+            } else if trimmedLine.contains("Type (Bundle):") {
+                let components = trimmedLine.components(separatedBy: ":")
+                if components.count > 1 {
+                    let bundleType = components[1].trimmingCharacters(in: .whitespaces)
+                    if bundleType.contains("EFI") {
+                        name = "EFI System Partition"
+                        type = "EFI"
+                    }
+                }
+            } else if trimmedLine.contains("Internal:") {
+                let components = trimmedLine.components(separatedBy: ":")
+                if components.count > 1 {
+                    let internalStr = components[1].trimmingCharacters(in: .whitespaces)
+                    isInternal = internalStr.contains("Yes")
+                }
+            }
+        }
+        
+        // If still no name, use a generic one
+        if name == deviceId || name.isEmpty {
+            name = "Disk \(deviceId)"
+        }
+        
+        // Determine type if still unknown
+        if type == "Unknown" {
+            if deviceId.contains("EFI") {
+                type = "EFI"
+            } else if isUSB {
+                type = "USB"
+            } else if isInternal {
+                type = "Internal"
+            } else {
+                // Try to determine by disk number
+                let diskNum = deviceId.replacingOccurrences(of: "disk", with: "").replacingOccurrences(of: "s.*", with: "", options: .regularExpression)
+                if let num = Int(diskNum), num < 5 {
+                    type = "Internal"
+                    isInternal = true
+                } else {
+                    type = "External"
+                }
+            }
+        }
+        
+        return DriveInfo(
+            name: name,
+            identifier: deviceId,
+            size: size,
+            type: type,
+            mountPoint: mountPoint,
+            isInternal: isInternal,
+            isEFI: deviceId.contains("EFI") || type == "EFI" || name.contains("EFI"),
+            partitions: [],
+            isMounted: isMounted,
+            isSelectedForMount: false,
+            isSelectedForUnmount: false
+        )
+    }
+    
+    // Mount selected drives - IMPROVED with better error handling
+    func mountSelectedDrives(drives: [DriveInfo]) -> (success: Bool, message: String) {
+        print("⏫ Mounting selected drives: \(drives.count)")
+        
+        var successCount = 0
+        var failedCount = 0
+        var messages: [String] = []
+        
+        for drive in drives where drive.isSelectedForMount && !drive.isMounted {
+            print("🔧 Attempting to mount drive: \(drive.name) (\(drive.identifier))")
+            
+            let mountResult = runCommand("diskutil mount /dev/\(drive.identifier)")
+            
+            if mountResult.success {
+                successCount += 1
+                messages.append("✅ \(drive.name): Mounted successfully")
+                
+                // Verify mount
+                let verifyResult = runCommand("diskutil info /dev/\(drive.identifier) | grep 'Mount Point'")
+                if verifyResult.output.contains("Not applicable") || verifyResult.output.contains("No mount point") {
+                    messages.append("⚠️ \(drive.name): Mounted but no mount point found")
+                }
+            } else {
+                failedCount += 1
+                // Try alternative method
+                print("⚠️ Standard mount failed, trying alternative method...")
+                let altResult = runCommand("diskutil mountDisk /dev/\(drive.identifier)")
+                
+                if altResult.success {
+                    successCount += 1
+                    messages.append("✅ \(drive.name): Mounted using alternative method")
+                } else {
+                    let errorMsg = mountResult.error.isEmpty ? "Unknown error" : mountResult.error
+                    messages.append("❌ \(drive.name): Failed - \(errorMsg)")
+                    
+                    // Try one more time with verbose output
+                    let debugResult = runCommand("diskutil mount /dev/\(drive.identifier) 2>&1")
+                    print("🔍 Debug mount output: \(debugResult.output)")
+                    print("🔍 Debug mount error: \(debugResult.error)")
+                }
+            }
+            
+            // Small delay between mounts
+            Thread.sleep(forTimeInterval: 0.5)
+        }
+        
+        let message = messages.joined(separator: "\n")
+        
+        if successCount > 0 && failedCount == 0 {
+            return (true, "Successfully mounted \(successCount) drive(s)\n\n\(message)")
+        } else if successCount > 0 && failedCount > 0 {
+            return (false, "Mounted \(successCount) drive(s), failed \(failedCount)\n\n\(message)")
+        } else if successCount == 0 && failedCount > 0 {
+            return (false, "Failed to mount all selected drives\n\n\(message)")
+        } else {
+            return (true, "No drives selected for mount")
+        }
+    }
+    
+    // Unmount selected drives - FIXED to only unmount user volumes
+    func unmountSelectedDrives(drives: [DriveInfo]) -> (success: Bool, message: String) {
+        print("⏬ Unmounting selected drives: \(drives.count)")
+        
+        var successCount = 0
+        var failedCount = 0
+        var messages: [String] = []
+        
+        for drive in drives where drive.isSelectedForUnmount && drive.isMounted {
+            print("🔧 Unmounting drive: \(drive.name) (\(drive.identifier))")
+            
+            // Skip system volumes and mounted applications
+            if drive.mountPoint.contains("/System/Volumes/") || 
+               drive.mountPoint == "/" ||
+               drive.mountPoint.contains("home") ||
+               drive.mountPoint.contains("private/var") ||
+               drive.mountPoint.contains("Library/Developer") {
+                print("⚠️ Skipping system volume: \(drive.name) at \(drive.mountPoint)")
+                messages.append("⚠️ \(drive.name): Skipped (system volume)")
+                continue
+            }
+            
+            let unmountResult = runCommand("diskutil unmount /dev/\(drive.identifier)")
+            
+            if unmountResult.success {
+                successCount += 1
+                messages.append("✅ \(drive.name): Unmounted successfully")
+            } else {
+                failedCount += 1
+                // Try force unmount
+                print("⚠️ Standard unmount failed, trying force unmount...")
+                let forceResult = runCommand("diskutil unmount force /dev/\(drive.identifier)")
+                
+                if forceResult.success {
+                    successCount += 1
+                    messages.append("✅ \(drive.name): Force unmounted")
+                } else {
+                    let errorMsg = unmountResult.error.isEmpty ? "Unknown error" : unmountResult.error
+                    messages.append("❌ \(drive.name): Failed - \(errorMsg)")
+                }
+            }
+            
+            // Small delay between unmounts
+            Thread.sleep(forTimeInterval: 0.5)
+        }
+        
+        let message = messages.joined(separator: "\n")
+        
+        if successCount > 0 && failedCount == 0 {
+            return (true, "Successfully unmounted \(successCount) drive(s)\n\n\(message)")
+        } else if successCount > 0 && failedCount > 0 {
+            return (false, "Unmounted \(successCount) drive(s), failed \(failedCount)\n\n\(message)")
+        } else if successCount == 0 && failedCount > 0 {
+            return (false, "Failed to unmount all selected drives\n\n\(message)")
+        } else {
+            return (true, "No drives selected for unmount")
+        }
+    }
+    
+    // Mount all unmounted external drives
+    func mountAllExternalDrives() -> (success: Bool, message: String) {
+        print("⏫ Mounting all external drives")
+        
+        // Find all unmounted external disks
+        let result = runCommand("""
+        diskutil list | grep -E '^/dev/disk' | grep -v 'internal' | awk '{print $1}' | sed 's|/dev/||' | while read disk; do
+            if ! mount | grep -q "/dev/$disk "; then
+                info=$(diskutil info /dev/$disk 2>/dev/null)
+                if echo "$info" | grep -q 'Protocol.*USB\\|Bus Protocol.*USB\\|Removable.*Yes\\|Internal.*No'; then
+                    echo "$disk"
+                fi
+            fi
+        done
+        """)
+        
+        let diskIds = result.output.components(separatedBy: "\n").filter { !$0.isEmpty }
+        print("🔍 Found \(diskIds.count) unmounted external drives: \(diskIds)")
+        
+        var successCount = 0
+        var failedCount = 0
+        var messages: [String] = []
+        
+        for diskId in diskIds {
+            print("🔧 Mounting external drive: \(diskId)")
+            let mountResult = runCommand("diskutil mount /dev/\(diskId)")
+            
+            if mountResult.success {
+                successCount += 1
+                messages.append("✅ Disk \(diskId): Mounted")
+            } else {
+                failedCount += 1
+                messages.append("❌ Disk \(diskId): Failed")
+            }
+            
+            // Small delay
+            Thread.sleep(forTimeInterval: 0.5)
+        }
+        
+        let message = messages.joined(separator: "\n")
+        
+        if successCount > 0 && failedCount == 0 {
+            return (true, "Successfully mounted \(successCount) external drive(s)\n\n\(message)")
+        } else if successCount > 0 && failedCount > 0 {
+            return (false, "Mounted \(successCount) drive(s), failed \(failedCount)\n\n\(message)")
+        } else if successCount == 0 && diskIds.isEmpty {
+            return (true, "No unmounted external drives found")
+        } else {
+            return (false, "Failed to mount external drives\n\n\(message)")
+        }
+    }
+    
+    // Unmount all external drives - FIXED to only unmount user volumes
+    func unmountAllExternalDrives() -> (success: Bool, message: String) {
+        print("⏬ Unmounting all external drives")
+        
+        // Get all mounted user volumes (not system volumes)
+        let result = runCommand("""
+        mount | grep '/Volumes/' | grep -v '/System/Volumes/' | awk '{print $1}' | sed 's|/dev/||' | sort -u
+        """)
+        
+        let diskIds = result.output.components(separatedBy: "\n").filter { !$0.isEmpty }
+        print("🔍 Found \(diskIds.count) mounted external drives: \(diskIds)")
+        
+        var successCount = 0
+        var failedCount = 0
+        var messages: [String] = []
+        
+        for diskId in diskIds {
+            // Skip if it's a system disk (disk0-4)
+            if diskId.starts(with: "disk0") || diskId.starts(with: "disk1") || 
+               diskId.starts(with: "disk2") || diskId.starts(with: "disk3") || 
+               diskId.starts(with: "disk4") {
+                print("⚠️ Skipping system disk: \(diskId)")
+                continue
+            }
+            
+            print("🔧 Unmounting external drive: \(diskId)")
+            let unmountResult = runCommand("diskutil unmount /dev/\(diskId)")
+            
+            if unmountResult.success {
+                successCount += 1
+                messages.append("✅ \(diskId): Unmounted")
+            } else {
+                failedCount += 1
+                messages.append("❌ \(diskId): Failed")
+            }
+            
+            // Small delay
+            Thread.sleep(forTimeInterval: 0.5)
+        }
+        
+        let message = messages.joined(separator: "\n")
+        
+        if successCount > 0 && failedCount == 0 {
+            return (true, "Successfully unmounted \(successCount) external drive(s)\n\n\(message)")
+        } else if successCount > 0 && failedCount > 0 {
+            return (false, "Unmounted \(successCount) drive(s), failed \(failedCount)\n\n\(message)")
+        } else if successCount == 0 && diskIds.isEmpty {
+            return (true, "No external drives mounted")
+        } else {
+            return (false, "Failed to unmount external drives\n\n\(message)")
+        }
+    }
+    
+    func isSIPDisabled() -> Bool {
+        let result = runCommand("csrutil status 2>/dev/null || echo 'Enabled'")
+        return result.output.lowercased().contains("disabled")
+    }
+    
+    func checkFullDiskAccess() -> Bool {
+        let testResult = runCommand("ls /Volumes/ 2>&1")
+        return !testResult.error.contains("Operation not permitted")
+    }
+}
+
+// MARK: - Data Structures
+struct DriveInfo: Identifiable, Equatable, Hashable {
+    let id = UUID()
+    let name: String
+    let identifier: String
+    let size: String
+    let type: String
+    let mountPoint: String
+    let isInternal: Bool
+    let isEFI: Bool
+    let partitions: [PartitionInfo]
+    var isMounted: Bool
+    var isSelectedForMount: Bool
+    var isSelectedForUnmount: Bool
+    
+    static func == (lhs: DriveInfo, rhs: DriveInfo) -> Bool {
+        return lhs.identifier == rhs.identifier
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(identifier)
+    }
+}
+
+struct PartitionInfo: Identifiable, Equatable {
+    let id = UUID()
+    let name: String
+    let identifier: String
+    let size: String
+    let type: String
+    let mountPoint: String
+    let isEFI: Bool
+    var isMounted: Bool
+    
+    static func == (lhs: PartitionInfo, rhs: PartitionInfo) -> Bool {
+        return lhs.identifier == rhs.identifier
+    }
+}
+
+// MARK: - Drive Manager
+class DriveManager: ObservableObject {
+    static let shared = DriveManager()
+    private let shellHelper = ShellHelper.shared
+    @Published var allDrives: [DriveInfo] = []
+    @Published var isLoading = false
+    @Published var mountSelection: Set<String> = []
+    @Published var unmountSelection: Set<String> = []
+    
+    private init() {}
+    
+    func refreshDrives() {
+        isLoading = true
+        print("🔄 Starting drive refresh...")
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            let drives = self.shellHelper.getAllDrives()
+            
+            DispatchQueue.main.async {
+                // Preserve selection state by creating new DriveInfo objects with updated selection
+                var updatedDrives: [DriveInfo] = []
+                for drive in drives {
+                    let updatedDrive = DriveInfo(
+                        name: drive.name,
+                        identifier: drive.identifier,
+                        size: drive.size,
+                        type: drive.type,
+                        mountPoint: drive.mountPoint,
+                        isInternal: drive.isInternal,
+                        isEFI: drive.isEFI,
+                        partitions: drive.partitions,
+                        isMounted: drive.isMounted,
+                        isSelectedForMount: self.mountSelection.contains(drive.identifier),
+                        isSelectedForUnmount: self.unmountSelection.contains(drive.identifier)
+                    )
+                    updatedDrives.append(updatedDrive)
+                }
+                self.allDrives = updatedDrives
+                self.isLoading = false
+                
+                print("🔄 Drive refresh complete. Found \(self.allDrives.count) drives:")
+                for drive in self.allDrives {
+                    let selection = drive.isSelectedForMount ? "✅ Mount" : (drive.isSelectedForUnmount ? "✅ Unmount" : "⬜ None")
+                    print("   - \(drive.name) (\(drive.identifier)): \(drive.isMounted ? "📌 Mounted" : "📦 Unmounted") - \(selection)")
+                }
+            }
+        }
+    }
+    
+    func toggleMountSelection(for drive: DriveInfo) {
+        print("🔘 Toggle mount selection for: \(drive.identifier)")
+        
+        if let index = allDrives.firstIndex(where: { $0.identifier == drive.identifier }) {
+            let currentDrive = allDrives[index]
+            
+            // Can only select unmounted drives for mount
+            if currentDrive.isMounted {
+                print("⚠️ Drive is already mounted, cannot select for mount")
+                return
+            }
+            
+            let newIsSelectedForMount = !currentDrive.isSelectedForMount
+            var newIsSelectedForUnmount = currentDrive.isSelectedForUnmount
+            
+            if newIsSelectedForMount && currentDrive.isSelectedForUnmount {
+                newIsSelectedForUnmount = false
+                unmountSelection.remove(drive.identifier)
+            }
+            
+            if newIsSelectedForMount {
+                mountSelection.insert(drive.identifier)
+                print("✅ Added \(drive.identifier) to mount selection")
+            } else {
+                mountSelection.remove(drive.identifier)
+                print("❌ Removed \(drive.identifier) from mount selection")
+            }
+            
+            // Update the drive in the array
+            allDrives[index] = DriveInfo(
+                name: currentDrive.name,
+                identifier: currentDrive.identifier,
+                size: currentDrive.size,
+                type: currentDrive.type,
+                mountPoint: currentDrive.mountPoint,
+                isInternal: currentDrive.isInternal,
+                isEFI: currentDrive.isEFI,
+                partitions: currentDrive.partitions,
+                isMounted: currentDrive.isMounted,
+                isSelectedForMount: newIsSelectedForMount,
+                isSelectedForUnmount: newIsSelectedForUnmount
+            )
+            
+            objectWillChange.send()
+        }
+    }
+    
+    func toggleUnmountSelection(for drive: DriveInfo) {
+        print("🔘 Toggle unmount selection for: \(drive.identifier)")
+        
+        if let index = allDrives.firstIndex(where: { $0.identifier == drive.identifier }) {
+            let currentDrive = allDrives[index]
+            
+            // Can only select mounted drives for unmount
+            if !currentDrive.isMounted {
+                print("⚠️ Drive is not mounted, cannot select for unmount")
+                return
+            }
+            
+            // Cannot unmount system volumes
+            if currentDrive.mountPoint.contains("/System/Volumes/") || 
+               currentDrive.mountPoint == "/" ||
+               currentDrive.mountPoint.contains("home") ||
+               currentDrive.mountPoint.contains("private/var") ||
+               currentDrive.mountPoint.contains("Library/Developer") {
+                print("⚠️ Cannot unmount system volume: \(currentDrive.mountPoint)")
+                return
+            }
+            
+            let newIsSelectedForUnmount = !currentDrive.isSelectedForUnmount
+            var newIsSelectedForMount = currentDrive.isSelectedForMount
+            
+            if newIsSelectedForUnmount && currentDrive.isSelectedForMount {
+                newIsSelectedForMount = false
+                mountSelection.remove(drive.identifier)
+            }
+            
+            if newIsSelectedForUnmount {
+                unmountSelection.insert(drive.identifier)
+                print("✅ Added \(drive.identifier) to unmount selection")
+            } else {
+                unmountSelection.remove(drive.identifier)
+                print("❌ Removed \(drive.identifier) from unmount selection")
+            }
+            
+            // Update the drive in the array
+            allDrives[index] = DriveInfo(
+                name: currentDrive.name,
+                identifier: currentDrive.identifier,
+                size: currentDrive.size,
+                type: currentDrive.type,
+                mountPoint: currentDrive.mountPoint,
+                isInternal: currentDrive.isInternal,
+                isEFI: currentDrive.isEFI,
+                partitions: currentDrive.partitions,
+                isMounted: currentDrive.isMounted,
+                isSelectedForMount: newIsSelectedForMount,
+                isSelectedForUnmount: newIsSelectedForUnmount
+            )
+            
+            objectWillChange.send()
+        }
+    }
+    
+    func selectAllForUnmount() {
+        print("🔘 Select all for unmount")
+        mountSelection.removeAll()
+        unmountSelection.removeAll()
+        
+        var updatedDrives: [DriveInfo] = []
+        for drive in allDrives {
+            // Only select user volumes for unmount (not system volumes)
+            let shouldSelectForUnmount = drive.isMounted && 
+                                         !drive.mountPoint.contains("/System/Volumes/") &&
+                                         drive.mountPoint != "/" &&
+                                         !drive.mountPoint.contains("home") &&
+                                         !drive.mountPoint.contains("private/var") &&
+                                         !drive.mountPoint.contains("Library/Developer")
+            
+            let updatedDrive = DriveInfo(
+                name: drive.name,
+                identifier: drive.identifier,
+                size: drive.size,
+                type: drive.type,
+                mountPoint: drive.mountPoint,
+                isInternal: drive.isInternal,
+                isEFI: drive.isEFI,
+                partitions: drive.partitions,
+                isMounted: drive.isMounted,
+                isSelectedForMount: false,
+                isSelectedForUnmount: shouldSelectForUnmount
+            )
+            updatedDrives.append(updatedDrive)
+            
+            if shouldSelectForUnmount {
+                unmountSelection.insert(drive.identifier)
+            }
+        }
+        allDrives = updatedDrives
+        objectWillChange.send()
+    }
+    
+    func clearAllSelections() {
+        print("🔘 Clear all selections")
+        mountSelection.removeAll()
+        unmountSelection.removeAll()
+        
+        var updatedDrives: [DriveInfo] = []
+        for drive in allDrives {
+            let updatedDrive = DriveInfo(
+                name: drive.name,
+                identifier: drive.identifier,
+                size: drive.size,
+                type: drive.type,
+                mountPoint: drive.mountPoint,
+                isInternal: drive.isInternal,
+                isEFI: drive.isEFI,
+                partitions: drive.partitions,
+                isMounted: drive.isMounted,
+                isSelectedForMount: false,
+                isSelectedForUnmount: false
+            )
+            updatedDrives.append(updatedDrive)
+        }
+        allDrives = updatedDrives
+        objectWillChange.send()
+    }
+    
+    func mountSelectedDrives() -> (success: Bool, message: String) {
+        print("🚀 Mounting selected drives")
+        let drivesToMount = allDrives.filter { $0.isSelectedForMount }
+        print("📦 Drives to mount: \(drivesToMount.count)")
+        
+        for drive in drivesToMount {
+            print("   - \(drive.name) (\(drive.identifier))")
+        }
+        
+        let result = shellHelper.mountSelectedDrives(drives: drivesToMount)
+        if result.success {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                self.refreshDrives()
+                self.clearAllSelections()
+            }
+        } else {
+            // Still refresh to get updated status
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.refreshDrives()
+            }
+        }
+        return (result.success, result.message)
+    }
+    
+    func unmountSelectedDrives() -> (success: Bool, message: String) {
+        print("🚀 Unmounting selected drives")
+        let drivesToUnmount = allDrives.filter { $0.isSelectedForUnmount }
+        print("📦 Drives to unmount: \(drivesToUnmount.count)")
+        
+        for drive in drivesToUnmount {
+            print("   - \(drive.name) (\(drive.identifier))")
+        }
+        
+        let result = shellHelper.unmountSelectedDrives(drives: drivesToUnmount)
+        if result.success {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                self.refreshDrives()
+                self.clearAllSelections()
+            }
+        } else {
+            // Still refresh to get updated status
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.refreshDrives()
+            }
+        }
+        return (result.success, result.message)
+    }
+    
+    func mountAllExternal() -> (success: Bool, message: String) {
+        print("🚀 Mount all external drives")
+        let result = shellHelper.mountAllExternalDrives()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            self.refreshDrives()
+        }
+        return (result.success, result.message)
+    }
+    
+    func unmountAllExternal() -> (success: Bool, message: String) {
+        print("🚀 Unmount all external drives")
+        let result = shellHelper.unmountAllExternalDrives()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            self.refreshDrives()
+        }
+        return (result.success, result.message)
+    }
+    
+    func getDriveBy(id: String) -> DriveInfo? {
+        return allDrives.first { $0.identifier == id }
+    }
+}
+
+// MARK: - Main Content View
+struct ContentView: View {
+    @State private var selectedTab = 0
+    @State private var showAlert = false
+    @State private var alertMessage = ""
+    @State private var alertTitle = "Status"
+    @State private var selectedDrive: DriveInfo?
+    @StateObject private var driveManager = DriveManager.shared
+    @State private var hasFullDiskAccess = false
+    
+    let shellHelper = ShellHelper.shared
+    
+    var body: some View {
+        ZStack {
+            VStack(spacing: 0) {
+                HeaderView
+                
+                TabView(selection: $selectedTab) {
+                    DriveManagementView
+                        .tabItem {
+                            Label("Drives", systemImage: "externaldrive")
+                        }
+                        .tag(0)
+                    
+                    SystemInfoView
+                        .tabItem {
+                            Label("Info", systemImage: "info.circle")
+                        }
+                        .tag(1)
+                }
+                .tabViewStyle(.automatic)
+            }
+            
+            if driveManager.isLoading {
+                ProgressOverlay
+            }
+        }
+        .alert(alertTitle, isPresented: $showAlert) {
+            Button("OK") { }
+        } message: {
+            Text(alertMessage)
+        }
+        .sheet(item: $selectedDrive) { drive in
+            DriveDetailView(drive: drive, driveManager: driveManager)
+        }
+        .onAppear {
+            checkPermissions()
+            driveManager.refreshDrives()
+        }
+    }
+    
+    // MARK: - Header View
+    private var HeaderView: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("SystemMaintenance")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                Text("Manual Drive Control")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+            
+            HStack(spacing: 12) {
+                // Stats
+                VStack(alignment: .trailing, spacing: 2) {
+                    let mountedCount = driveManager.allDrives.filter { $0.isMounted }.count
+                    let totalCount = driveManager.allDrives.count
+                    Text("\(mountedCount)/\(totalCount) Mounted")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    let mountSelected = driveManager.allDrives.filter { $0.isSelectedForMount }.count
+                    let unmountSelected = driveManager.allDrives.filter { $0.isSelectedForUnmount }.count
+                    if mountSelected > 0 {
+                        Text("\(mountSelected) to mount")
+                            .font(.caption2)
+                            .foregroundColor(.green)
+                    } else if unmountSelected > 0 {
+                        Text("\(unmountSelected) to unmount")
+                            .font(.caption2)
+                            .foregroundColor(.orange)
+                    }
+                }
+                
+                // Refresh Button
+                Button(action: {
+                    driveManager.refreshDrives()
+                }) {
+                    HStack {
+                        Image(systemName: "arrow.clockwise")
+                        Text("Refresh")
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                }
+                .buttonStyle(.bordered)
+                .disabled(driveManager.isLoading)
+            }
+        }
+        .padding()
+        .background(Color(.windowBackgroundColor))
+    }
+    
+    // MARK: - Drive Management View
+    private var DriveManagementView: some View {
+        ScrollView {
+            VStack(spacing: 20) {
+                // Control Panel
+                ControlPanelView
+                
+                // Drives List
+                if driveManager.allDrives.isEmpty {
+                    EmptyDrivesView
+                } else {
+                    DrivesListView
+                }
+                
+                // Quick Actions
+                QuickActionsGrid
+            }
+            .padding()
+        }
+    }
+    
+    private var ControlPanelView: some View {
+        VStack(spacing: 16) {
+            HStack {
+                Text("Drive Controls")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                
+                Spacer()
+                
+                // Clear Selection Button
+                Button("Clear All") {
+                    driveManager.clearAllSelections()
+                }
+                .buttonStyle(.bordered)
+                .font(.caption)
+                .disabled(driveManager.mountSelection.isEmpty && driveManager.unmountSelection.isEmpty)
+            }
+            
+            // Action Buttons
+            HStack(spacing: 12) {
+                // Mount Button
+                Button(action: {
+                    mountSelected()
+                }) {
+                    HStack {
+                        Image(systemName: "play.fill")
+                        Text("Mount Selected")
+                    }
+                    .frame(minWidth: 150)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.green)
+                .disabled(driveManager.allDrives.filter { $0.isSelectedForMount }.isEmpty)
+                
+                // Unmount Button
+                Button(action: {
+                    unmountSelected()
+                }) {
+                    HStack {
+                        Image(systemName: "eject.fill")
+                        Text("Unmount Selected")
+                    }
+                    .frame(minWidth: 150)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.orange)
+                .disabled(driveManager.allDrives.filter { $0.isSelectedForUnmount }.isEmpty)
+                
+                Spacer()
+                
+                // Only "Select All to Unmount" button
+                Button("Select All to Unmount") {
+                    driveManager.selectAllForUnmount()
+                }
+                .buttonStyle(.bordered)
+                .font(.caption)
+                .disabled(driveManager.allDrives.filter { 
+                    $0.isMounted && 
+                    !$0.mountPoint.contains("/System/Volumes/") &&
+                    $0.mountPoint != "/" &&
+                    !$0.mountPoint.contains("home") &&
+                    !$0.mountPoint.contains("private/var") &&
+                    !$0.mountPoint.contains("Library/Developer")
+                }.isEmpty)
+            }
+        }
+        .padding()
+        .background(Color(.controlBackgroundColor))
+        .cornerRadius(12)
+    }
+    
+    private var EmptyDrivesView: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "externaldrive.badge.xmark")
+                .font(.largeTitle)
+                .foregroundColor(.secondary)
+            
+            Text("No Drives Found")
+                .font(.headline)
+                .foregroundColor(.secondary)
+            
+            Text("Connect a drive or check permissions")
+                .font(.caption)
+                .foregroundColor(.secondary)
+            
+            Button("Refresh") {
+                driveManager.refreshDrives()
+            }
+            .buttonStyle(.bordered)
+            .font(.caption)
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+    }
+    
+    private var DrivesListView: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Text("Available Drives")
+                    .font(.headline)
+                    .foregroundColor(.secondary)
+                
+                Spacer()
+                
+                let mountCount = driveManager.allDrives.filter { $0.isSelectedForMount }.count
+                let unmountCount = driveManager.allDrives.filter { $0.isSelectedForUnmount }.count
+                if mountCount > 0 {
+                    Text("\(mountCount) to mount")
+                        .font(.caption)
+                        .foregroundColor(.green)
+                } else if unmountCount > 0 {
+                    Text("\(unmountCount) to unmount")
+                        .font(.caption)
+                        .foregroundColor(.orange)
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+            
+            // List
+            ForEach(driveManager.allDrives) { drive in
+                DriveRow(drive: drive)
+                    .onTapGesture {
+                        selectedDrive = drive
+                    }
+            }
+        }
+        .background(Color(.controlBackgroundColor))
+        .cornerRadius(12)
+    }
+    
+    private func DriveRow(drive: DriveInfo) -> some View {
+        HStack(spacing: 8) {
+            // Mount/Unmount Selection
+            VStack(spacing: 2) {
+                // Mount checkbox (only for unmounted drives)
+                if !drive.isMounted {
+                    Button(action: {
+                        driveManager.toggleMountSelection(for: drive)
+                    }) {
+                        Image(systemName: drive.isSelectedForMount ? "play.circle.fill" : "play.circle")
+                            .foregroundColor(drive.isSelectedForMount ? .green : .gray)
+                            .font(.title3)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Select to mount")
+                }
+                
+                // Unmount checkbox (only for mounted drives that are not system volumes)
+                if drive.isMounted && 
+                   !drive.mountPoint.contains("/System/Volumes/") &&
+                   drive.mountPoint != "/" &&
+                   !drive.mountPoint.contains("home") &&
+                   !drive.mountPoint.contains("private/var") &&
+                   !drive.mountPoint.contains("Library/Developer") {
+                    
+                    Button(action: {
+                        driveManager.toggleUnmountSelection(for: drive)
+                    }) {
+                        Image(systemName: drive.isSelectedForUnmount ? "eject.circle.fill" : "eject.circle")
+                            .foregroundColor(drive.isSelectedForUnmount ? .orange : .gray)
+                            .font(.title3)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Select to unmount")
+                }
+            }
+            .frame(width: 40)
+            
+            // Drive Icon
+            Image(systemName: drive.isEFI ? "memorychip" : (drive.isInternal ? "internaldrive.fill" : "externaldrive.fill"))
+                .foregroundColor(drive.isEFI ? .purple : (drive.isInternal ? .blue : .orange))
+                .font(.title3)
+            
+            // Drive Info
+            VStack(alignment: .leading, spacing: 2) {
+                HStack {
+                    Text(drive.name)
+                        .font(.body)
+                        .fontWeight(.medium)
+                        .foregroundColor(.primary)
+                    
+                    if drive.isMounted {
+                        Circle()
+                            .fill(Color.green)
+                            .frame(width: 6, height: 6)
+                    }
+                }
+                
+                HStack(spacing: 12) {
+                    Text(drive.identifier)
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundColor(.secondary)
+                    
+                    Text("•")
+                        .foregroundColor(.secondary)
+                    
+                    Text(drive.size)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    Text("•")
+                        .foregroundColor(.secondary)
+                    
+                    Text(drive.type)
+                        .font(.caption)
+                        .foregroundColor(drive.isEFI ? .purple : (drive.type.contains("USB") ? .orange : .secondary))
+                    
+                    if !drive.mountPoint.isEmpty {
+                        Text("•")
+                            .foregroundColor(.secondary)
+                        
+                        Text(drive.mountPoint)
+                            .font(.caption)
+                            .foregroundColor(.green)
+                            .lineLimit(1)
+                    }
+                }
+            }
+            
+            Spacer()
+            
+            // Status Badge
+            if drive.isMounted {
+                HStack {
+                    Circle()
+                        .fill(Color.green)
+                        .frame(width: 6, height: 6)
+                    Text("Mounted")
+                        .font(.caption)
+                        .foregroundColor(.green)
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Color.green.opacity(0.1))
+                .cornerRadius(20)
+            } else {
+                HStack {
+                    Circle()
+                        .fill(Color.gray)
+                        .frame(width: 6, height: 6)
+                    Text("Unmounted")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(20)
+            }
+            
+            // Detail Button
+            Button(action: {
+                selectedDrive = drive
+            }) {
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal)
+        .background(Color.gray.opacity(0.05))
+        .cornerRadius(8)
+        .contentShape(Rectangle())
+    }
+    
+    private var QuickActionsGrid: some View {
+        LazyVGrid(columns: [
+            GridItem(.flexible()),
+            GridItem(.flexible())
+        ], spacing: 12) {
+            ActionButton(
+                title: "Refresh All",
+                icon: "arrow.clockwise",
+                color: .blue,
+                action: {
+                    driveManager.refreshDrives()
+                    checkPermissions()
+                }
+            )
+            
+            ActionButton(
+                title: "Mount All External",
+                icon: "play.circle",
+                color: .green,
+                action: {
+                    mountAllExternal()
+                }
+            )
+            
+            ActionButton(
+                title: "Unmount All External",
+                icon: "eject.circle",
+                color: .orange,
+                action: {
+                    unmountAllExternal()
+                }
+            )
+            
+            ActionButton(
+                title: "Clear Selection",
+                icon: "xmark.circle",
+                color: .gray,
+                action: {
+                    driveManager.clearAllSelections()
+                }
+            )
+        }
+        .padding()
+        .background(Color(.controlBackgroundColor))
+        .cornerRadius(12)
+    }
+    
+    private func ActionButton(title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.title2)
+                    .foregroundColor(color)
+                Text(title)
+                    .font(.caption)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(maxWidth: .infinity, minHeight: 80)
+            .foregroundColor(color)
+            .background(color.opacity(0.1))
+            .cornerRadius(10)
+        }
+        .buttonStyle(.plain)
+    }
+    
+    // MARK: - System Info View
+    private var SystemInfoView: some View {
+        ScrollView {
+            VStack(spacing: 20) {
+                // Header
+                HStack {
+                    Text("System Information")
+                        .font(.title)
+                        .fontWeight(.bold)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        driveManager.refreshDrives()
+                        showAlert(title: "Refreshed", message: "System information updated")
+                    }) {
+                        Label("Refresh", systemImage: "arrow.clockwise")
+                            .font(.caption)
+                    }
+                    .buttonStyle(.bordered)
+                }
+                .padding(.horizontal)
+                
+                // Drives Info
+                VStack(alignment: .leading, spacing: 16) {
+                    HStack {
+                        Text("Storage Drives")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                        
+                        Spacer()
+                        
+                        let mountedCount = driveManager.allDrives.filter { $0.isMounted }.count
+                        Text("\(mountedCount)/\(driveManager.allDrives.count) mounted")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    if driveManager.allDrives.isEmpty {
+                        Text("No drives detected")
+                            .foregroundColor(.secondary)
+                            .padding()
+                    } else {
+                        ForEach(driveManager.allDrives) { drive in
+                            DriveInfoCard(drive: drive)
+                        }
+                    }
+                }
+                .padding()
+                .background(Color(.controlBackgroundColor))
+                .cornerRadius(12)
+                
+                Spacer()
+            }
+            .padding()
+        }
+    }
+    
+    private func DriveInfoCard(drive: DriveInfo) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: drive.isEFI ? "memorychip" : (drive.isInternal ? "internaldrive.fill" : "externaldrive.fill"))
+                    .foregroundColor(drive.isEFI ? .purple : (drive.isInternal ? .blue : .orange))
+                
+                Text(drive.name)
+                    .font(.headline)
+                
+                Spacer()
+                
+                Text(drive.size)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                
+                if drive.isMounted {
+                    Circle()
+                        .fill(Color.green)
+                        .frame(width: 6, height: 6)
+                }
+            }
+            
+            HStack {
+                Text(drive.identifier)
+                    .font(.system(.caption, design: .monospaced))
+                    .foregroundColor(.secondary)
+                
+                Text("•")
+                    .foregroundColor(.secondary)
+                
+                Text(drive.type)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                
+                if drive.isMounted && !drive.mountPoint.isEmpty {
+                    Text("•")
+                        .foregroundColor(.secondary)
+                    
+                    Text(drive.mountPoint)
+                        .font(.caption)
+                        .foregroundColor(.green)
+                        .lineLimit(1)
+                }
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.05))
+        .cornerRadius(8)
+        .onTapGesture {
+            selectedDrive = drive
+        }
+    }
+    
+    // MARK: - Progress Overlay
+    private var ProgressOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.5)
+                .edgesIgnoringSafeArea(.all)
+            
+            VStack(spacing: 20) {
+                ProgressView()
+                    .scaleEffect(1.5)
+                
+                Text("Loading drives...")
+                    .font(.headline)
+                    .foregroundColor(.white)
+            }
+            .padding(40)
+            .background(Color(.windowBackgroundColor))
+            .cornerRadius(20)
+        }
+    }
+    
+    // MARK: - Action Functions
+    
+    private func checkPermissions() {
+        DispatchQueue.global(qos: .background).async {
+            let hasAccess = shellHelper.checkFullDiskAccess()
+            DispatchQueue.main.async {
+                hasFullDiskAccess = hasAccess
+                if !hasAccess {
+                    showAlert(title: "Permissions Info",
+                             message: "Full Disk Access is required for full functionality. The app will still work with limited features.")
+                }
+            }
+        }
+    }
+    
+    private func mountSelected() {
+        let result = driveManager.mountSelectedDrives()
+        showAlert(title: result.success ? "Success" : "Error",
+                 message: result.message)
+    }
+    
+    private func unmountSelected() {
+        let result = driveManager.unmountSelectedDrives()
+        showAlert(title: result.success ? "Success" : "Error",
+                 message: result.message)
+    }
+    
+    private func mountAllExternal() {
+        let result = driveManager.mountAllExternal()
+        showAlert(title: result.success ? "Success" : "Error",
+                 message: result.message)
+    }
+    
+    private func unmountAllExternal() {
+        let result = driveManager.unmountAllExternal()
+        showAlert(title: result.success ? "Success" : "Error",
+                 message: result.message)
+    }
+    
+    private func showAlert(title: String, message: String) {
+        alertTitle = title
+        alertMessage = message
+        showAlert = true
+    }
+}
+
+// MARK: - Drive Detail View
+struct DriveDetailView: View {
+    let drive: DriveInfo
+    @ObservedObject var driveManager: DriveManager
+    @Environment(\.dismiss) var dismiss
+    
+    @State private var operationInProgress = false
+    @State private var operationMessage = ""
+    @State private var showOperationAlert = false
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            // Header
+            HStack {
+                Image(systemName: drive.isEFI ? "memorychip" : (drive.isInternal ? "internaldrive.fill" : "externaldrive.fill"))
+                    .font(.largeTitle)
+                    .foregroundColor(drive.isEFI ? .purple : (drive.isInternal ? .blue : .orange))
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(drive.name)
+                        .font(.title)
+                        .fontWeight(.bold)
+                    
+                    HStack(spacing: 12) {
+                        Text(drive.identifier)
+                            .font(.system(.body, design: .monospaced))
+                            .foregroundColor(.secondary)
+                        
+                        Text("•")
+                            .foregroundColor(.secondary)
+                        
+                        Text(drive.size)
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                
+                Spacer()
+                
+                // Mount Status Badge
+                if drive.isMounted {
+                    HStack {
+                        Circle()
+                            .fill(Color.green)
+                            .frame(width: 8, height: 8)
+                        Text("Mounted")
+                            .font(.caption)
+                            .foregroundColor(.green)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.green.opacity(0.1))
+                    .cornerRadius(20)
+                } else {
+                    HStack {
+                        Circle()
+                            .fill(Color.gray)
+                            .frame(width: 8, height: 8)
+                        Text("Unmounted")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(20)
+                }
+            }
+            
+            Divider()
+            
+            // Drive Info
+            VStack(alignment: .leading, spacing: 12) {
+                InfoRow(label: "Type:", value: drive.type)
+                InfoRow(label: "Internal:", value: drive.isInternal ? "Yes" : "No")
+                InfoRow(label: "EFI:", value: drive.isEFI ? "Yes" : "No")
+                InfoRow(label: "Mount Point:", value: drive.mountPoint.isEmpty ? "Not mounted" : drive.mountPoint)
+                InfoRow(label: "Selected for Mount:", value: getCurrentDrive()?.isSelectedForMount ?? false ? "Yes" : "No")
+                InfoRow(label: "Selected for Unmount:", value: getCurrentDrive()?.isSelectedForUnmount ?? false ? "Yes" : "No")
+            }
+            .padding()
+            .background(Color.gray.opacity(0.05))
+            .cornerRadius(10)
+            
+            // Action Buttons
+            HStack(spacing: 12) {
+                if operationInProgress {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                    Text("Processing...")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else {
+                    // Mount/Unmount Toggle
+                    let currentDrive = getCurrentDrive()
+                    
+                    if drive.isMounted {
+                        // Only show unmount option for non-system volumes
+                        if !drive.mountPoint.contains("/System/Volumes/") &&
+                           drive.mountPoint != "/" &&
+                           !drive.mountPoint.contains("home") &&
+                           !drive.mountPoint.contains("private/var") &&
+                           !drive.mountPoint.contains("Library/Developer") {
+                            
+                            Button(action: {
+                                if let currentDrive = currentDrive {
+                                    driveManager.toggleUnmountSelection(for: currentDrive)
+                                }
+                                dismiss()
+                            }) {
+                                HStack {
+                                    Image(systemName: currentDrive?.isSelectedForUnmount ?? false ? "eject.circle.fill" : "eject.circle")
+                                    Text(currentDrive?.isSelectedForUnmount ?? false ? "Deselect Unmount" : "Select to Unmount")
+                                }
+                                .frame(minWidth: 180)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(currentDrive?.isSelectedForUnmount ?? false ? .orange : .blue)
+                        } else {
+                            Text("System Volume")
+                                .foregroundColor(.secondary)
+                                .frame(minWidth: 180)
+                        }
+                    } else {
+                        Button(action: {
+                            if let currentDrive = currentDrive {
+                                driveManager.toggleMountSelection(for: currentDrive)
+                            }
+                            dismiss()
+                        }) {
+                            HStack {
+                                Image(systemName: currentDrive?.isSelectedForMount ?? false ? "play.circle.fill" : "play.circle")
+                                Text(currentDrive?.isSelectedForMount ?? false ? "Deselect Mount" : "Select to Mount")
+                            }
+                            .frame(minWidth: 180)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(currentDrive?.isSelectedForMount ?? false ? .green : .blue)
+                    }
+                    
+                    Button("Show in Finder") {
+                        showInFinder()
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(!drive.isMounted || drive.mountPoint.isEmpty)
+                }
+                
+                Spacer()
+                
+                Button("Close") {
+                    dismiss()
+                }
+                .buttonStyle(.bordered)
+            }
+            
+            Spacer()
+        }
+        .padding()
+        .frame(width: 500, height: 400)
+        .alert("Operation Result", isPresented: $showOperationAlert) {
+            Button("OK") { }
+        } message: {
+            Text(operationMessage)
+        }
+        .onAppear {
+            print("📱 DriveDetailView appeared for: \(drive.identifier)")
+            print("📱 Current selection state - Mount: \(getCurrentDrive()?.isSelectedForMount ?? false), Unmount: \(getCurrentDrive()?.isSelectedForUnmount ?? false)")
+        }
+    }
+    
+    private func getCurrentDrive() -> DriveInfo? {
+        return driveManager.allDrives.first { $0.identifier == drive.identifier }
+    }
+    
+    private func InfoRow(label: String, value: String) -> some View {
+        HStack {
+            Text(label)
+                .fontWeight(.medium)
+                .frame(width: 140, alignment: .leading)
+            Text(value)
+                .foregroundColor(.secondary)
+            Spacer()
+        }
+    }
+    
+    private func showInFinder() {
+        guard !drive.mountPoint.isEmpty else { return }
+        
+        let url = URL(fileURLWithPath: drive.mountPoint)
+        NSWorkspace.shared.open(url)
+    }
+}
+
+// MARK: - Preview
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+            .frame(width: 1200, height: 800)
+    }
+}

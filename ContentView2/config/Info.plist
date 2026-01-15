@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Basic App Info -->
+    <key>CFBundleName</key>
+    <string>SystemMaintenance</string>
+    
+    <key>CFBundleIdentifier</key>
+    <string>com.sysm.SystemMaintenance</string>
+    
+    <key>CFBundleVersion</key>
+    <string>1.0.0</string>
+    
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    
+    <key>CFBundleSignature</key>
+    <string>????</string>
+    
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+    
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    
+    <!-- Minimum macOS Version -->
+    <key>LSMinimumSystemVersion</key>
+    <string>11.0</string>
+    
+    <!-- App Category (Utilities) -->
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.utilities</string>
+    
+    <!-- =========================================== -->
+    <!-- ESSENTIAL PERMISSIONS FOR SYSTEM MAINTENANCE -->
+    <!-- =========================================== -->
+    
+    <!-- 1. DRIVE MANAGEMENT PERMISSIONS -->
+    <key>NSFullDiskAccessUsageDescription</key>
+    <string>SystemMaintenance needs Full Disk Access to detect, mount, and manage storage drives. This allows the app to view all connected drives (internal, external, USB) and perform drive operations.</string>
+    
+    <key>NSRemovableVolumesUsageDescription</key>
+    <string>This app needs access to removable volumes to manage USB drives, external disks, SD cards, and other removable storage devices.</string>
+    
+    <key>NSDocumentsFolderUsageDescription</key>
+    <string>SystemMaintenance needs access to files and folders to manage mounted volumes, browse drive contents, and perform file operations.</string>
+    
+    <!-- 2. SYSTEM MAINTENANCE PERMISSIONS -->
+    <key>NSSystemAdministrationUsageDescription</key>
+    <string>This app needs administrator privileges to perform system maintenance tasks including managing kernel extensions (kexts), audio tools, SSDT generation, and troubleshooting system issues.</string>
+    
+    <key>NSAppleEventsUsageDescription</key>
+    <string>SystemMaintenance uses AppleScript to run administrative commands for system maintenance tasks with your permission.</string>
+    
+    <!-- 3. SHELL/TERMINAL PERMISSIONS -->
+    <key>NSFileProviderDomainUsageDescription</key>
+    <string>This app needs access to system files and directories to run shell commands for system diagnostics and maintenance.</string>
+    
+    <!-- 4. AUDIO TOOLS PERMISSIONS -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>SystemMaintenance may need microphone access for audio diagnostics and testing tools.</string>
+    
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>This app needs speech recognition access for audio testing and configuration tools.</string>
+    
+    <!-- 5. KERNEL EXTENSIONS PERMISSIONS -->
+    <key>NSSystemExtensionUsageDescription</key>
+    <string>SystemMaintenance needs permission to manage kernel extensions (kexts) for system optimization and hardware compatibility.</string>
+    
+    <!-- 6. NETWORK PERMISSIONS (if applicable) -->
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>This app may need local network access for system diagnostics and troubleshooting network-related issues.</string>
+    
+    <!-- =========================================== -->
+    <!-- APP CONFIGURATION -->
+    <!-- =========================================== -->
+    
+    <!-- Disable App Sandbox (REQUIRED for system tools) -->
+    <key>com.apple.security.app-sandbox</key>
+    <false/>
+    
+    <!-- Enable access to user-selected files -->
+    <key>com.apple.security.files.user-selected.read-write</key>
+    <true/>
+    
+    <!-- Allow access to Downloads folder -->
+    <key>com.apple.security.files.downloads.read-write</key>
+    <true/>
+    
+    <!-- Allow access to removable storage -->
+    <key>com.apple.security.device.usb</key>
+    <true/>
+    <key>com.apple.security.device.firewire</key>
+    <true/>
+    <key>com.apple.security.device.serial</key>
+    <true/>
+    <key>com.apple.security.device.pci</key>
+    <true/>
+    
+    <!-- Allow temporary exception for execution -->
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <true/>
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+    
+    <!-- Dark Mode Support -->
+    <key>NSRequiresAquaSystemAppearance</key>
+    <false/>
+    
+    <!-- High Resolution Support -->
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    
+    <!-- Supports automatic graphics switching -->
+    <key>NSSupportsAutomaticGraphicsSwitching</key>
+    <true/>
+    
+    <!-- =========================================== -->
+    <!-- APP CAPABILITIES -->
+    <!-- =========================================== -->
+    
+    <!-- Optional: If using helper app for privileged operations -->
+    <key>SMPrivilegedExecutables</key>
+    <dict>
+        <key>com.sysm.SystemMaintenance.Helper</key>
+        <string>anchor apple generic and identifier &quot;com.sysm.SystemMaintenance.Helper&quot; and (certificate leaf[field.1.2.840.113635.100.6.1.9] /* exists */ or certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = &quot;YOUR_TEAM_ID&quot;)</string>
+    </dict>
+    
+</dict>
+</plist>

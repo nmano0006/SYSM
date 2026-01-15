@@ -1,0 +1,584 @@
+{
+  "source": "/Users/z790/Desktop/SystemMaintenanceMac/SystemMaintenance/SystemMaintenance/Views/SSDTGeneratorView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Generate custom SSDTs for your Hackintosh",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 357
+        }
+      },
+      {
+        "comment": "",
+        "key": "Advanced SSDT Generator",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 336
+        }
+      },
+      {
+        "comment": "",
+        "key": "Help",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 347
+        }
+      },
+      {
+        "comment": "",
+        "key": "Device Configuration",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 366
+        }
+      },
+      {
+        "comment": "",
+        "key": "Device Type",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 372
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 376
+        }
+      },
+      {
+        "comment": "",
+        "key": "Essential SSDTs",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 400
+        }
+      },
+      {
+        "comment": "",
+        "key": "Select All",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 407
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clear All",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 412
+        }
+      },
+      {
+        "comment": "",
+        "key": "Available SSDT Templates",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 433
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld selected",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 440
+        }
+      },
+      {
+        "comment": "",
+        "key": "Select All",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 444
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clear All",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 450
+        }
+      },
+      {
+        "comment": "",
+        "key": "CPU Model",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 495
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 499
+        }
+      },
+      {
+        "comment": "",
+        "key": "GPU Model",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 510
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 514
+        }
+      },
+      {
+        "comment": "",
+        "key": "Connector",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 525
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 528
+        }
+      },
+      {
+        "comment": "",
+        "key": "Memory (GB)",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 538
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 541
+        }
+      },
+      {
+        "comment": "",
+        "key": "Spoof ID",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 551
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 554
+        }
+      },
+      {
+        "comment": "",
+        "key": "Motherboard Model",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 563
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 567
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chipset",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 577
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 580
+        }
+      },
+      {
+        "comment": "",
+        "key": "Preset",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 590
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 593
+        }
+      },
+      {
+        "comment": "",
+        "key": "USB Port Count",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 611
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 615
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ ports",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 617
+        }
+      },
+      {
+        "comment": "",
+        "key": "Controller Type",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 625
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 629
+        }
+      },
+      {
+        "comment": "",
+        "key": "USB Wake Fix",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 640
+        }
+      },
+      {
+        "comment": "",
+        "key": "USB Injector",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 644
+        }
+      },
+      {
+        "comment": "",
+        "key": "Power Properties",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 648
+        }
+      },
+      {
+        "comment": "",
+        "key": "Audio Codec",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 657
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 661
+        }
+      },
+      {
+        "comment": "",
+        "key": "Layout ID:",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 670
+        }
+      },
+      {
+        "comment": "",
+        "key": "0x07",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 673
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom DSDT Name",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 681
+        }
+      },
+      {
+        "comment": "",
+        "key": "DSDT.aml",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 685
+        }
+      },
+      {
+        "comment": "",
+        "key": "USB Port Configuration",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 787
+        }
+      },
+      {
+        "comment": "",
+        "key": "Generate USB Config",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 804
+        }
+      },
+      {
+        "comment": "",
+        "key": "Selected Configuration: %@ ports",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 793
+        }
+      },
+      {
+        "comment": "",
+        "key": "This will generate SSDT-UIAC for port mapping",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 797
+        }
+      },
+      {
+        "comment": "",
+        "key": "Generated USB SSDTs:",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 812
+        }
+      },
+      {
+        "comment": "",
+        "key": "No SSDTs available for %@",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 841
+        }
+      },
+      {
+        "comment": "",
+        "key": "Advanced Options",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 869
+        }
+      },
+      {
+        "comment": "",
+        "key": "Compile DSL to AML (requires iasl)",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 896
+        }
+      },
+      {
+        "comment": "",
+        "key": "ACPI Table Source:",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 872
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 875
+        }
+      },
+      {
+        "comment": "",
+        "key": "Auto-detect",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 876
+        }
+      },
+      {
+        "comment": "",
+        "key": "Extract from system",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 877
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom file",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 878
+        }
+      },
+      {
+        "comment": "",
+        "key": "Output Path:",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 885
+        }
+      },
+      {
+        "comment": "",
+        "key": "Leave empty for default",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 888
+        }
+      },
+      {
+        "comment": "",
+        "key": "Browse...",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 890
+        }
+      },
+      {
+        "comment": "",
+        "key": "Generating SSDTs... %lld%%",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 925
+        }
+      },
+      {
+        "comment": "",
+        "key": "Generated Files",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 937
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open Folder",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 942
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 960
+        }
+      },
+      {
+        "comment": "",
+        "key": "Copy",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 966
+        }
+      },
+      {
+        "comment": "",
+        "key": "Generating...",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 996
+        }
+      },
+      {
+        "comment": "",
+        "key": "Generate SSDTs",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 999
+        }
+      },
+      {
+        "comment": "",
+        "key": "Validate",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1013
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save to File",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1029
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open Guide",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1042
+        }
+      },
+      {
+        "comment": "",
+        "key": "Auto Generate",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1054
+        }
+      },
+      {
+        "comment": "",
+        "key": "Essential",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1087
+        }
+      },
+      {
+        "comment": "",
+        "key": "Essential",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1145
+        }
+      }
+    ]
+  },
+  "version": 1
+}

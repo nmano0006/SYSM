@@ -1,0 +1,20 @@
+
+
+SystemMaintenance/
+├── SystemMaintenanceApp.swift          // App entry point
+├── ContentView.swift                   // Main tabs navigation
+├── Assets.xcassets                     // App assets
+│   ├── AppIcon.appiconset/            // App icons
+│   └── SYSM_Logo.imageset/            // Custom SYSM logo (new)
+├── Views/                              // All view files go here
+│   ├── DriveManagementView.swift       // (create next)
+│   ├── SystemInfoView.swift           // (create next)
+│   ├── KextsManagerView.swift         // (create next)
+│   ├── AudioToolsView.swift           // (create next)
+│   ├── SSDTGeneratorView.swift        // (create next)
+│   └── InfoView.swift                 // (create next)
+├── Models/
+│   └── DriveInfo.swift                // Data structures
+└── Helpers/
+    ├── ShellHelper.swift              // Shell command helper
+    └── DriveManager.swift             // Drive management logic

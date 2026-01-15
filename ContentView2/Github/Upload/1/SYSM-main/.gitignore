@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+*.xcuserdatad
+*.xcbkptlist
+*.xcscheme
+xcuserdata/
+
+# Swift
+*.swp
+*~
+*.tmp
+
+# Logs
+*.log

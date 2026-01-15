@@ -1,0 +1,216 @@
+{
+  "source": "/Users/z790/Desktop/SystemMaintenanceMac/SystemMaintenance/SystemMaintenance/Views/AudioToolsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Audio Tools",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 58
+        }
+      },
+      {
+        "comment": "",
+        "key": "Audio Tools",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 19
+        }
+      },
+      {
+        "comment": "",
+        "key": "Refresh",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 26
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 59
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld%%",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 103
+        }
+      },
+      {
+        "comment": "",
+        "key": "Volume Control",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 86
+        }
+      },
+      {
+        "comment": "",
+        "key": "Toggle system audio output",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 131
+        }
+      },
+      {
+        "comment": "",
+        "key": "Mute Control",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 118
+        }
+      },
+      {
+        "comment": "",
+        "key": "Audio Muted",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 123
+        }
+      },
+      {
+        "comment": "",
+        "key": "Audio Enabled",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 123
+        }
+      },
+      {
+        "comment": "",
+        "key": "No output device",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 181
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current Device",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 146
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@Hz • %@ channels",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 176
+        }
+      },
+      {
+        "comment": "",
+        "key": "Output",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 157
+        }
+      },
+      {
+        "comment": "",
+        "key": "Default",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 166
+        }
+      },
+      {
+        "comment": "",
+        "key": "Audio Testing",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 193
+        }
+      },
+      {
+        "comment": "",
+        "key": "Audio Report",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 221
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stop Test",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 201
+        }
+      },
+      {
+        "comment": "",
+        "key": "Play Test Sound",
+        "location": {
+          "startingColumn": 61,
+          "startingLine": 201
+        }
+      },
+      {
+        "comment": "",
+        "key": "Test Microphone",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 212
+        }
+      },
+      {
+        "comment": "",
+        "key": "No %@ found",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 246
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld devices",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 239
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@Hz • %@ channels",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 324
+        }
+      },
+      {
+        "comment": "",
+        "key": "Built-in",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 314
+        }
+      },
+      {
+        "comment": "",
+        "key": "Input",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 305
+        }
+      },
+      {
+        "comment": "",
+        "key": "Output",
+        "location": {
+          "startingColumn": 64,
+          "startingLine": 305
+        }
+      }
+    ]
+  },
+  "version": 1
+}

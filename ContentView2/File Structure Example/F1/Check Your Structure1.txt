@@ -1,0 +1,16 @@
+SystemMaintenance/
+├── SystemMaintenanceApp.swift      // App entry point (keep as is)
+├── ContentView.swift               // Updated with all tabs
+├── Views/
+│   ├── DriveManagementView.swift   // (already in ContentView above)
+│   ├── SystemInfoView.swift        // Create new file
+│   ├── KextsManagerView.swift      // Create new file
+│   ├── AudioToolsView.swift        // Create new file
+│   ├── SSDTGeneratorView.swift     // Create new file
+│   └── InfoView.swift             // Create new file
+├── Models/
+│   ├── DriveInfo.swift            // Your existing structs
+│   └── KextInfo.swift             // Add if needed
+└── Helpers/
+    ├── ShellHelper.swift          // Your existing class
+    └── DriveManager.swift         // Your existing class

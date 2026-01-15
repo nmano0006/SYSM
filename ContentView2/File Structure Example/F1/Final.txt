@@ -1,0 +1,16 @@
+SystemMaintenance/
+├── ContentView.swift                          # Updated with all logos
+├── Assets.xcassets/
+│   ├── SYSMLogo.imageset/                    # Light logo
+│   └── SYSMLogoDark.imageset/                # Dark logo
+├── Views/
+│   ├── LogoAnimationTypes.swift              # Shared types
+│   ├── DarkModeLogoView.swift                # ✓
+│   ├── AnimatedLogoView.swift                # ✓
+│   ├── LoadingLogoView.swift                 # ✓
+│   ├── InteractiveLogoView.swift             # ✓
+│   ├── EnhancedLogoView.swift                # ✓
+│   ├── ShakeLogoView.swift                   # ✓
+│   ├── LogoAnimationGallery.swift            # ✓ (optional)
+│   └── (Your other views...)
+└── (Other folders...)

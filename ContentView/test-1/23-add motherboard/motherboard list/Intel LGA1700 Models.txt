@@ -1,0 +1,36 @@
+ROG MAXIMUS Z790 SERIES:
+- ROG Maximus Z790 Apex (DDR5, Extreme OC)
+- ROG Maximus Z790 Hero (Balanced Flagship)
+- ROG Maximus Z790 Dark Hero (Updated Hero)
+- ROG Maximus Z790 Formula (Water-Cooling Focus)
+- ROG Maximus Z790 Extreme (Most Expensive)
+
+ROG STRIX Z790/B760 SERIES:
+- ROG Strix Z790-E Gaming WiFi (High-End, DDR5, Wi-Fi 6E)
+- ROG Strix Z790-F Gaming WiFi (Mid-High, DDR5)
+- ROG Strix Z790-A Gaming WiFi (White Aesthetic)
+- ROG Strix Z790-H Gaming WiFi (Entry ROG)
+- ROG Strix Z790-I Gaming WiFi (Mini-ITX)
+- ROG Strix B760-F Gaming WiFi (High B760)
+- ROG Strix B760-A Gaming WiFi (White B760)
+- ROG Strix B760-G Gaming WiFi (mATX)
+- ROG Strix B760-I Gaming WiFi (Mini-ITX)
+
+TUF GAMING SERIES:
+- TUF Gaming Z790-Plus WiFi (DDR5)
+- TUF Gaming Z790-Plus WiFi D4 (DDR4)
+- TUF Gaming B760-Plus WiFi (DDR5)
+- TUF Gaming B760-Plus WiFi D4 (DDR4)
+- TUF Gaming B760M-Plus WiFi (mATX)
+- TUF Gaming B760M-Plus WiFi D4 (mATX DDR4)
+
+PROART SERIES:
+- ProArt Z790-Creator WiFi (Thunderbolt 4)
+- ProArt B760-Creator D4 (Budget Creator)
+
+PRIME SERIES:
+- Prime Z790-P WiFi
+- Prime Z790-A WiFi
+- Prime B760-Plus
+- Prime B760M-A WiFi (mATX)
+- Prime H770-Plus

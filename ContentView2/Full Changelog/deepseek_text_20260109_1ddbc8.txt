@@ -1,0 +1,25 @@
+
+## 4. **Keep a Changelog Format**
+/Users/z790/Desktop/SystemMaintenanceMac/SystemMaintenance/SystemMaintenance/src/Views/AudioToolsView.swift:127:14 'onChange(of:perform:)' was deprecated in macOS 14.0: Use `onChange` with a two or zero parameter action closure instead.
+
+All notable changes to this project will be documented in this file.
+
+## [X.Y.Z] - YYYY-MM-DD
+### Added
+- New feature A
+- New feature B
+
+### Changed
+- Changed feature C
+- Modified component D
+
+### Fixed
+- Fixed bug in component E
+- Resolved issue with F
+
+### Removed
+- Deprecated feature G
+- Removed legacy code H
+
+## [Previous Version] - YYYY-MM-DD
+...

@@ -1,0 +1,23 @@
+src/
+├── Helpers/
+│   ├── DriveManager
+│   └── ShellHelper
+├── Models/
+│   └── DriveInfo
+├── Views/
+│   ├── AnimatedLogoView
+│   ├── AudioToolsView
+│   ├── DarkModelLogoView
+│   ├── DriveManagementView
+│   ├── EnhancedLogoView
+│   ├── InfoView
+│   ├── InteractiveLogoView
+│   ├── KextsManagerView
+│   ├── LoadingLogoView
+│   ├── LogoAnimationGallery
+│   ├── LogoAnimationTypes
+│   ├── ShakeLogoView
+│   ├── SSDTGeneratorView
+│   ├── SystemInfoView
+│   └── ContentView
+└── SystemMaintenanceApp
