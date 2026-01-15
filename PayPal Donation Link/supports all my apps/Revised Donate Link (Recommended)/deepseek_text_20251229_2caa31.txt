@@ -1,4 +1,0 @@
- Please add bottom Tiny shape for support https://www.paypal.com/donate/?business=H3PV9HX92AVMJ&no_recurring=0&item_name=Support+my+open-source+development+work.+Donations+help+fund+testing+devices%2C+server+costs%2C+and+ongoing+maintenance+for+all+my+projects.&currency_code=CAD
-
-Please add developer name Navaratnam Manoranjan
-Email nmano0006@gmail.com
