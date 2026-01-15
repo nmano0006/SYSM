@@ -1,8 +1,0 @@
-{
-  "" : {
-    "pch" : "/Users/z790/Library/Developer/Xcode/DerivedData/SystemMaintenance-gfoahtnxtzfbesbtutgtmvvhtvdq/Build/Intermediates.noindex/SystemMaintenance.build/Debug/SystemMaintenance.build/Objects-normal/x86_64/SystemMaintenance-primary-Bridging-header.pch"
-  },
-  "/Users/z790/Desktop/SystemMaintenanceMac/SystemMaintenance/SystemMaintenance/ContentView.swift" : {
-    "object" : "/Users/z790/Library/Developer/Xcode/DerivedData/SystemMaintenance-gfoahtnxtzfbesbtutgtmvvhtvdq/Build/Intermediates.noindex/SystemMaintenance.build/Debug/SystemMaintenance.build/Objects-normal/x86_64/ContentView.__XCPREVIEW_THUNKSUFFIX__.preview-thunk.o"
-  }
-}

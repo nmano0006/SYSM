@@ -1,5 +1,0 @@
-SYSM_Logo.imageset/
-├── Contents.json
-├── SYSM_Logo.png      → 1x (512×512)
-├── SYSM_Logo@2x.png   → 2x (1024×1024)  
-└── SYSM_Logo@3x.png   → 3x (1536×1536)
