@@ -2,45 +2,64 @@
 
 [![Latest Release](https://img.shields.io/github/v/release/nmano0006/SYSM)](https://github.com/nmano0006/SYSM/releases/latest)
 
-A comprehensive macOS application for system maintenance, drive management, kext management, and troubleshooting.
+A comprehensive macOS application for system maintenance, drive management, kext management, and troubleshooting. Built specifically for macOS/Hackintosh systems.
 
 ## 📸 Screenshots
 
 ### 1. Drive Management
 ![Drive Management](1-Drive%20Management.png)
-*Mount, unmount, and manage storage drives*
+*Mount, unmount, and manage storage drives including EFI partitions*
 
 ### 2. System Information
 ![System Information](2-System%20Information.png)
-*Detailed hardware and software information*
+*Detailed hardware and software information including bootloader details*
 
 ### 3. Kexts Manager
 ![Kexts Manager](3-Kexts%20Manager.png)
-*AppleHDA installer and kext management*
+*AppleHDA installer and kext management with OpenCore integration*
 
 ### 4. Audio Tools
 ![Audio Tools](4-Audio%20Tools.png)
-*Volume control and audio device management*
+*Volume control, audio device management, and testing tools*
 
 ### 5. Hex/Base64 Calculator
 ![Hex/Base64 Calculator](5-Calculator.png)
-*Encoding conversion tools*
+*Encoding conversion tools for developers and troubleshooters*
 
 ### 6. SSDT Generator
 ![SSDT Generator](6-SSDT%20Generator.png)
-*Advanced SSDT generation for Hackintosh systems*
+*Advanced SSDT generation for Hackintosh systems with comprehensive template library*
 
 ### 7. OpenCore Config Editor
 ![OpenCore Config Editor](7-OpenCore%20Config%20Editor.png)
-*Complete OpenCore configuration management*
+*Complete OpenCore configuration management with real-time status monitoring*
 
 ### 8. System Information Panel
 ![System Information Panel](8-System%20Information.png)
-*Quick system stats and donation information*
+*Quick system stats and feature overview*
 
 ### 9. Troubleshooting
 ![Troubleshooting](9-Troubleshoot.png)
-*System diagnostics and troubleshooting tools*
+*System diagnostics and automated troubleshooting tools*
+
+## ✨ Features
+
+### **Core Modules:**
+- **Drive Manager**: Full EFI partition management, drive mounting/unmounting, storage analysis
+- **System Information**: Comprehensive hardware/software diagnostics with Hackintosh support
+- **Kexts Manager**: AppleHDA installer with OpenCore integration
+- **Audio Tools**: Complete audio system control and device management
+- **SSDT Generator**: Advanced SSDT creation for Hackintosh optimization
+- **OpenCore Config Editor**: Complete configuration management for OpenCore bootloader
+- **Troubleshooting**: Automated system diagnostics and issue resolution
+- **Utilities**: Hex calculator, encoding tools, and system maintenance tasks
+
+### **Specialized Tools:**
+- **Hackintosh Support**: OpenCore detection, SSDT generation, kext management
+- **Security Tools**: SIP status monitoring, permission verification
+- **Network Tools**: Interface management and diagnostics
+- **Power Management**: CPU monitoring, temperature tracking
+- **Boot Management**: NVRAM utilities, boot argument configuration
 
 ## 📥 Download
 
@@ -48,48 +67,76 @@ A comprehensive macOS application for system maintenance, drive management, kext
 
 **[View on InsanelyMac Forum](https://www.insanelymac.com/forum/topic/362188-sysm-macos-system-maintenance-tool/)**
 
-## ✨ What's New in v1.0.1
+## 🛠 System Requirements
 
-### 🚀 Major Features
-- **OpenCore Config Editor**: Complete OpenCore configuration management
-- **Enhanced Kexts Manager**: Now with AppleHDA Installer and KDK Manager
-- **SSDT Generator**: Advanced SSDT generation for Hackintosh systems
-- **Expanded device databases** with modern hardware support
+- **macOS Version:** macOS 11.0 (Big Sur) or later
+- **Processor:** Intel or Apple Silicon (with Rosetta 2)
+- **Memory:** 4GB minimum, 8GB recommended
+- **Storage:** 100MB available space
+- **Bootloader:** OpenCore (recommended for full functionality)
+- **Permissions:** Administrator access for system-level features
 
-### 🔧 Improvements
-- Better EFI detection with permission handling
-- Enhanced error messages and diagnostics
-- Improved UI with developer attribution
-- Comprehensive system monitoring tools
+## 🔧 Installation
+
+1. Download the latest DMG file from the releases page
+2. Open the DMG and drag SYSM to your Applications folder
+3. Launch SYSM (right-click → Open if Gatekeeper blocks it)
+4. Grant necessary permissions when prompted
+
+**Note:** Some features require administrator privileges and may need to be run with `sudo` for full functionality.
+
+## 🚀 What's New in v1.0.1
+
+### **Major Features:**
+- **Complete OpenCore Integration**: Full configuration editor with real-time monitoring
+- **Enhanced Kexts Manager**: Now includes AppleHDA Installer and KDK Manager
+- **Advanced SSDT Generator**: Comprehensive template library for Hackintosh optimization
+- **Expanded Device Support**: Modern hardware database with Intel 13th Gen support
+- **System Troubleshooting**: Automated issue detection and resolution
+
+### **Improvements:**
+- **Better EFI Management**: Enhanced partition detection with permission handling
+- **Improved Diagnostics**: Detailed error messages and system analysis
+- **Enhanced UI**: Developer attribution and improved navigation
+- **Comprehensive Monitoring**: Real-time system status tracking
+- **Security Enhancements**: SIP monitoring and permission verification
+
+### **Bug Fixes:**
+- Fixed EFI mounting permissions on newer macOS versions
+- Improved compatibility with macOS Sonoma and later
+- Resolved audio configuration issues
+- Fixed memory leak in drive management module
 
 ## ☕ Support Development
 
-SYSM is free and open-source. If you find it useful, please consider supporting its development:
+SYSM is free and open-source software developed by **Navaratnam Manoranjana**. If you find it useful, please consider supporting its development:
 
 **[Donate via PayPal](https://www.paypal.com/donate/?business=H3PV9HX92AVMJ&no_recurring=0&item_name=Support+SYSM+development.+Donations+fund+testing+devices+%26+server+costs+for+this+open-source+tool.&currency_code=CAD)**
 
-### Why Support?
-- Funds continued development and updates
-- Helps add new features and tools
-- Covers testing devices and server costs
-- Supports free, open-source software development
+### **Why Support?**
+- 📱 Funds continued development and feature updates
+- 🧪 Helps acquire testing devices for compatibility
+- 🌐 Covers server costs for update distribution
+- 💡 Supports free, open-source software development
+- 🔧 Enables faster bug fixes and improvements
 
-### Support Tiers:
-- ☕ **$5** - Coffee supporter
-- 💻 **$15** - Developer supporter
-- 🚀 **$30** - Premium supporter
-- 🏆 **$50+** - Gold supporter
+### **Support Tiers:**
+- ☕ **$5** - Coffee supporter (helps with server costs)
+- 💻 **$15** - Developer supporter (helps fund new features)
+- 🚀 **$30** - Premium supporter (supports device testing)
+- 🏆 **$50+** - Gold supporter (major feature sponsorship)
 
-*Every donation helps keep SYSM updated and improves the tool for everyone!*
+*Every donation helps keep SYSM updated and improves the tool for the entire Hackintosh community!*
 
 ## 🛠️ Building from Source
 
-### Requirements:
+### **Requirements:**
 - Xcode 14.0 or later
 - macOS 11.0 (Big Sur) or later
 - Swift 5.7+
+- Git for version control
 
-### Steps:
+### **Build Steps:**
 ```bash
 # Clone repository
 git clone https://github.com/nmano0006/SYSM.git
@@ -97,3 +144,6 @@ cd SYSM
 
 # Open in Xcode
 open SystemMaintenance.xcodeproj
+
+# Build and run
+# Product → Run (⌘R)
