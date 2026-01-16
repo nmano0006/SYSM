@@ -107,7 +107,8 @@ git clone https://github.com/nmano0006/SYSM.git
 cd SYSM
 
 ## 📸 Screenshots
-
+[
+](https://github.com/nmano0006/SYSM/blob/main/Screenshots%201.0.1/1-Drive%20Management.png)
 
 # Open in Xcode
 open SystemMaintenance.xcodeproj
