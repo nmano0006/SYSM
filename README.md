@@ -4,6 +4,44 @@
 
 A comprehensive macOS application for system maintenance, drive management, kext management, and troubleshooting.
 
+## 📸 Screenshots
+
+### 1. Drive Management
+![Drive Management](1-Drive%20Management.png)
+*Mount, unmount, and manage storage drives*
+
+### 2. System Information
+![System Information](2-System%20Information.png)
+*Detailed hardware and software information*
+
+### 3. Kexts Manager
+![Kexts Manager](3-Kexts%20Manager.png)
+*AppleHDA installer and kext management*
+
+### 4. Audio Tools
+![Audio Tools](4-Audio%20Tools.png)
+*Volume control and audio device management*
+
+### 5. Hex/Base64 Calculator
+![Hex/Base64 Calculator](5-Calculator.png)
+*Encoding conversion tools*
+
+### 6. SSDT Generator
+![SSDT Generator](6-SSDT%20Generator.png)
+*Advanced SSDT generation for Hackintosh systems*
+
+### 7. OpenCore Config Editor
+![OpenCore Config Editor](7-OpenCore%20Config%20Editor.png)
+*Complete OpenCore configuration management*
+
+### 8. System Information Panel
+![System Information Panel](8-System%20Information.png)
+*Quick system stats and donation information*
+
+### 9. Troubleshooting
+![Troubleshooting](9-Troubleshoot.png)
+*System diagnostics and troubleshooting tools*
+
 ## 📥 Download
 
 **[Download Latest Version (v1.0.1)](https://github.com/nmano0006/SYSM/releases/download/v1.0.1/SYSM_v1.0.1.dmg)**
