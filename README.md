@@ -106,6 +106,9 @@ SYSM is free and open-source software developed by **Navaratnam Manoranjana**. I
 git clone https://github.com/nmano0006/SYSM.git
 cd SYSM
 
+## 📸 Screenshots
+
+
 # Open in Xcode
 open SystemMaintenance.xcodeproj
 
