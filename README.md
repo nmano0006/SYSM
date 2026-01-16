@@ -4,43 +4,7 @@
 
 A comprehensive macOS application for system maintenance, drive management, kext management, and troubleshooting. Built specifically for macOS/Hackintosh systems.
 
-## 📸 Screenshots
 
-### 1. Drive Management
-![Drive Management](1-Drive%20Management.png)
-*Mount, unmount, and manage storage drives including EFI partitions*
-
-### 2. System Information
-![System Information](2-System%20Information.png)
-*Detailed hardware and software information including bootloader details*
-
-### 3. Kexts Manager
-![Kexts Manager](3-Kexts%20Manager.png)
-*AppleHDA installer and kext management with OpenCore integration*
-
-### 4. Audio Tools
-![Audio Tools](4-Audio%20Tools.png)
-*Volume control, audio device management, and testing tools*
-
-### 5. Hex/Base64 Calculator
-![Hex/Base64 Calculator](5-Calculator.png)
-*Encoding conversion tools for developers and troubleshooters*
-
-### 6. SSDT Generator
-![SSDT Generator](6-SSDT%20Generator.png)
-*Advanced SSDT generation for Hackintosh systems with comprehensive template library*
-
-### 7. OpenCore Config Editor
-![OpenCore Config Editor](7-OpenCore%20Config%20Editor.png)
-*Complete OpenCore configuration management with real-time status monitoring*
-
-### 8. System Information Panel
-![System Information Panel](8-System%20Information.png)
-*Quick system stats and feature overview*
-
-### 9. Troubleshooting
-![Troubleshooting](9-Troubleshoot.png)
-*System diagnostics and automated troubleshooting tools*
 
 ## ✨ Features
 
