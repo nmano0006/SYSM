@@ -121,7 +121,7 @@ SYSM is free and open-source software developed by **Navaratnam Manoranjana**. I
 - 🔧 Enables faster bug fixes and improvements
 
 ### **Support Tiers:**
-- ☕ **$5** - Coffee supporter (helps with server costs)
+
 - 💻 **$15** - Developer supporter (helps fund new features)
 - 🚀 **$30** - Premium supporter (supports device testing)
 - 🏆 **$50+** - Gold supporter (major feature sponsorship)
